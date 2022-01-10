@@ -1,0 +1,4 @@
+﻿Layers
+
+Grid		0.90
+Collision	0.91

@@ -1,0 +1,16 @@
+{
+  "items": [
+    {
+      "name": "goldOre",
+      "weight": 0.1
+    },
+    {
+      "name": "strangeRock",
+      "weight": 0.2
+    },
+    {
+      "name": "normalLog",
+      "weight": 0.3
+    }
+  ]
+}

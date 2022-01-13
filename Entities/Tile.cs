@@ -7,6 +7,7 @@ using System.Text;
 using ZonerEngine.GL;
 using ZonerEngine.GL.Components;
 using ZonerEngine.GL.Entities;
+using ZonerEngine.GL.States;
 
 namespace Others.Entities
 {
@@ -35,7 +36,7 @@ namespace Others.Entities
     public override void LoadContent()
     {
       AddComponent(new TextureComponent(this, _texture));
-      AddComponent(new TextureComponent(this, _borderTexture, () => _state.ShowGrid) { Layer = 0.90f, });
+      AddComponent(new TextureComponent(this, _borderTexture, () => _state.ShowGrid) { Layer = 0.95f, });
     }
   }
 }

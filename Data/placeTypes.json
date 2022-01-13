@@ -1,0 +1,9 @@
+{
+  "values": [
+    "Collection",
+    "Sleeping",
+    "Idle",
+    "Storage",
+    "Production"
+  ]
+}

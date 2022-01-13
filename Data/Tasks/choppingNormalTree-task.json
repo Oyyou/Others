@@ -1,0 +1,17 @@
+{
+  "name": "choppingNormalTree",
+  "rate": 1,
+  "type": "Collection",
+  "skillRequirements": [
+    {
+      "name": "chopping",
+      "level": 1
+    }
+  ],
+  "producedItems": [
+    {
+      "name": "normalLog",
+      "chance": 1
+    }
+  ]
+}

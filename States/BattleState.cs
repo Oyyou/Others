@@ -4,6 +4,7 @@ using Others.Entities;
 using Others.Managers;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using ZonerEngine.GL;
@@ -22,6 +23,8 @@ namespace Others.States
 
     private List<Entity> _entities = new List<Entity>();
 
+    private GameWorldManager _gwm;
+
     public bool ShowGrid { get; private set; } = false;
 
     public bool ShowCollisionBox { get; private set; } = false;
@@ -39,7 +42,12 @@ namespace Others.States
 
     public override void LoadContent()
     {
-      _map = new Map(32, 20, '0');
+      _gwm = new GameWorldManager();
+      _gwm.Load("save.json");
+
+      //var mapData = File.ReadAllLines("Maps/Map_001.txt").Select(c => c.ToArray()).ToList();
+
+      _map = new Map(40, 40, '0');
 
       var tileTexture = _content.Load<Texture2D>("Tiles/Floor");
       var crateTexture = _content.Load<Texture2D>("Cover/Crate");
@@ -47,14 +55,32 @@ namespace Others.States
       {
         for (int x = 0; x < _map.Width; x++)
         {
-          _entities.Add(new Tile(x, y, tileTexture, this));
+          var value = _map.Data[y, x];
+
+         // _entities.Add(new Tile(x, y, tileTexture, this));
+        }
+      }
+
+      foreach (var place in _gwm.GameWorld.Places)
+      {
+        try
+        {
+          var texture = _content.Load<Texture2D>($"Places/{place.Name}");
+          var xOffset = place.XOriginPercentage != 0 ? (place.XOriginPercentage / 100f) * texture.Width : 0;
+          var yOffset = place.YOriginPercentage != 0 ? (place.YOriginPercentage / 100f) * texture.Height : 0;
+          if(xOffset != 0)
+          {
+
+          }
+          var placeEntity = new Place(place, texture, this) { Layer = 0.09f, PositionOffset = new Vector2(xOffset, yOffset), };
+          _entities.Add(placeEntity);
+        }
+        catch(Exception e)
+        {
 
         }
       }
 
-      _entities.Add(new Crate(5, 5, crateTexture, this) { Layer = 0.1f });
-      _entities.Add(new Crate(6, 5, crateTexture, this) { Layer = 0.1f });
-      _entities.Add(new Crate(6, 7, crateTexture, this) { Layer = 0.1f });
 
       _map.WriteMap();
       foreach (var entity in _entities)
@@ -125,6 +151,8 @@ namespace Others.States
     public override void Draw(GameTime gameTime)
     {
       _spriteBatch.Begin(SpriteSortMode.FrontToBack);
+
+      //((TextureComponent)_entities[10].Components[0]).Layer = 0.02f;
 
       foreach (var entity in _entities)
         entity.Draw(gameTime, _spriteBatch);

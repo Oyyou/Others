@@ -1,0 +1,21 @@
+{
+  "name": "miningGold",
+  "rate": 1,
+  "type": "Collection",
+  "skillRequirements": [
+    {
+      "name": "mining",
+      "level": 1
+    }
+  ],
+  "producedItems": [
+    {
+      "name": "goldOre",
+      "chance": 0.9
+    },
+    {
+      "name": "strangeRock",
+      "chance": 0.1
+    }
+  ]
+}

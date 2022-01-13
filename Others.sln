@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31410.357
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Others", "Others.csproj", "{35A8830A-5CD2-40EC-9DF4-0D54FD8E00D9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZonerEngine.GL", "..\ZonerEngine.GL\ZonerEngine.GL\ZonerEngine.GL.csproj", "{DADE6378-36EA-4788-A418-38ACE1448FDD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{35A8830A-5CD2-40EC-9DF4-0D54FD8E00D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35A8830A-5CD2-40EC-9DF4-0D54FD8E00D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35A8830A-5CD2-40EC-9DF4-0D54FD8E00D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35A8830A-5CD2-40EC-9DF4-0D54FD8E00D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DADE6378-36EA-4788-A418-38ACE1448FDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DADE6378-36EA-4788-A418-38ACE1448FDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DADE6378-36EA-4788-A418-38ACE1448FDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DADE6378-36EA-4788-A418-38ACE1448FDD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F56C25EB-811C-446C-B5D7-56EEECA5212F}
+	EndGlobalSection
+EndGlobal

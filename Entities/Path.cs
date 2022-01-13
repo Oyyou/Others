@@ -27,7 +27,7 @@ namespace Others.Entities
 
     public override void LoadContent()
     {
-      AddComponent(new TextureComponent(this, _texture) { Layer = 0.93f, Colour = Color.Red });
+      AddComponent(new TextureComponent(this, _texture) { Layer = 0.06f, Colour = Color.Red });
     }
   }
 }

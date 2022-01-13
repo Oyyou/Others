@@ -1,0 +1,67 @@
+{
+  "places": [
+    {
+      "name": "goldOre",
+      "skill": "mining",
+      "type": "Collection",
+      "width": 1,
+      "height": 1,
+      "additionalProperties": {
+        "health": 10
+      }
+    },
+    {
+      "name": "smelter",
+      "skill": "smithing",
+      "type": "Production",
+      "additionalProperties": {
+        "health": 100
+      }
+    },
+    {
+      "name": "storageChest",
+      "skill": "",
+      "type": "Storage",
+      "additionalProperties": {
+        "capacity": 50
+      }
+    },
+    {
+      "name": "normalTree",
+      "skill": "chopping",
+      "type": "Collection",
+      "width": 1,
+      "height": 2,
+      "xOriginPercentage": -25,
+      "yOriginPercentage": -5,
+      "additionalProperties": {
+        "health": 50
+      }
+    },
+    {
+      "name": "singleBed",
+      "skill": "",
+      "type": "Sleeping",
+      "xOriginPercentage": 0,
+      "yOriginPercentage": -33,
+      "additionalProperties": {
+        "capacity": 1,
+        "ownerId": -1
+      },
+      "mainResource": 6,
+      "requiredResources": [
+        {
+          "name": "cotton",
+          "value": 4
+        }
+      ]
+    },
+    {
+      "name": "idleSpot",
+      "skill": "",
+      "type": "Idle",
+      "additionalProperties": {
+      }
+    }
+  ]
+}

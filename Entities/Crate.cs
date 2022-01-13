@@ -35,7 +35,7 @@ namespace Others.Entities
     public override void LoadContent()
     {
       AddComponent(new TextureComponent(this, _texture) { Layer = (Layer + _point.Y / 100f), PositionOffset = new Vector2(0, -Game1.TileSize) });
-      AddComponent(new TextureComponent(this, _collisionTexture, () => _state.ShowCollisionBox) { Layer = 0.91f, });
+      AddComponent(new TextureComponent(this, _collisionTexture, () => _state.ShowCollisionBox) { Layer = 0.96f, });
       AddComponent(new MappedComponent(this, '1', () => new Rectangle(_point.X, _point.Y, 1, 1)));
     }
   }

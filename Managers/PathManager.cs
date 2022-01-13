@@ -51,12 +51,12 @@ namespace Others.Managers
       var ru = new Entity();
       var ud = new Entity();
 
-      ld.AddComponent(new TextureComponent(ld, content.Load<Texture2D>("Path/LD")) { Layer = 0.95f, });
-      lr.AddComponent(new TextureComponent(lr, content.Load<Texture2D>("Path/LR")) { Layer = 0.95f, });
-      lu.AddComponent(new TextureComponent(lu, content.Load<Texture2D>("Path/LU")) { Layer = 0.95f, });
-      rd.AddComponent(new TextureComponent(rd, content.Load<Texture2D>("Path/RD")) { Layer = 0.95f, });
-      ru.AddComponent(new TextureComponent(ru, content.Load<Texture2D>("Path/RU")) { Layer = 0.95f, });
-      ud.AddComponent(new TextureComponent(ud, content.Load<Texture2D>("Path/UD")) { Layer = 0.95f, });
+      ld.AddComponent(new TextureComponent(ld, content.Load<Texture2D>("Path/LD")) { Layer = 0.94f, });
+      lr.AddComponent(new TextureComponent(lr, content.Load<Texture2D>("Path/LR")) { Layer = 0.94f, });
+      lu.AddComponent(new TextureComponent(lu, content.Load<Texture2D>("Path/LU")) { Layer = 0.94f, });
+      rd.AddComponent(new TextureComponent(rd, content.Load<Texture2D>("Path/RD")) { Layer = 0.94f, });
+      ru.AddComponent(new TextureComponent(ru, content.Load<Texture2D>("Path/RU")) { Layer = 0.94f, });
+      ud.AddComponent(new TextureComponent(ud, content.Load<Texture2D>("Path/UD")) { Layer = 0.94f, });
 
       _pathPrefabs = new Dictionary<string, Entity>()
       {

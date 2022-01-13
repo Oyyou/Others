@@ -1,0 +1,13 @@
+{
+  "name": "energy",
+  "total": 100,
+  "taskType": "sleeping",
+  "positiveTasks": {
+    "Sleeping": 0.2//0.0037
+  },
+  "negativeTasks": {
+    "Collection": 0.1,// 0.00185,
+    "Travelling": 0.00150,
+    "Idle":  0.1
+  }
+}

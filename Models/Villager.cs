@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Xna.Framework;
+using Newtonsoft.Json;
 using Others.Managers;
 using System;
 using System.Collections.Generic;
@@ -30,6 +31,9 @@ namespace Others.Models
 
     [JsonProperty("name")]
     public string Name { get; set; }
+
+    [JsonProperty("mapPoint")]
+    public Point MapPoint { get; set; }
 
     [JsonProperty("skills")]
     public Dictionary<string, float> Skills { get; set; }
@@ -271,7 +275,7 @@ namespace Others.Models
     {
       var place = GetCurrentPlace(gwm);
 
-      if (GameWorldManager.Random.Next(0, 100) == 1)
+      if (IsAtPlace(place))
       {
         CurrentPlaceId = place.Id;
         Console.WriteLine($"{Name} is now at {place.Name}");
@@ -279,6 +283,13 @@ namespace Others.Models
       }
 
       _taskTimer = 0;
+    }
+
+    public bool IsAtPlace(PlaceWrapper place)
+    {
+      var distance = Vector2.Distance(this.MapPoint.ToVector2(), place.Point.ToVector2());
+
+      return distance < 1.5f;
     }
 
     public void UpdateAttributes()

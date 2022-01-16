@@ -61,6 +61,14 @@ namespace Others.States
         }
       }
 
+      var villagerTexture = _content.Load<Texture2D>($"Villager");
+
+      foreach (var villager in _gwm.GameWorld.Villagers)
+      {
+        var villagerEntity = new Villager(villager, villagerTexture, this) { PositionOffset = new Vector2(0, -Game1.TileSize) };
+        _entities.Add(villagerEntity);
+      }
+
       foreach (var place in _gwm.GameWorld.Places)
       {
         try
@@ -110,6 +118,8 @@ namespace Others.States
 
       if (GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.C))
         ShowCollisionBox = !ShowCollisionBox;
+
+      _gwm.Update();
 
       /*PreviousMousePosition = CurrentMousePosition;
       CurrentMousePosition = new Point((int)Math.Floor(GameMouse.Position.X / (double)Game1.TileSize), (int)Math.Floor(GameMouse.Position.Y / (double)Game1.TileSize));

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Xna.Framework;
+using Newtonsoft.Json;
 using Others.Models;
 using System;
 using System.Collections.Generic;
@@ -128,11 +129,12 @@ namespace Others.Managers
       }
     }
 
-    public void AddVillager(string name, Dictionary<string, float> skills = null)
+    public void AddVillager(string name, Point mapPoint, Dictionary<string, float> skills = null)
     {
       GameWorld.Villagers.Add(new Villager(name)
       {
         Id = GetId("villager"),
+        MapPoint = mapPoint,
         Skills = skills,
         Attributes = GameWorld.AttributeData.ToDictionary(c => c.Key, v =>
         {
@@ -274,7 +276,7 @@ namespace Others.Managers
 
     private void SetDefaultWorld()
     {
-      AddVillager("Kyle", new Dictionary<string, float>() { { "mining", 1 }, { "chopping", 1 } });
+      AddVillager("Kyle", new Point(0, 0), new Dictionary<string, float>() { { "mining", 1 }, { "chopping", 1 } });
       //AddVillager("Niall", new Dictionary<string, float>() { { "chopping", 1 } });
 
       AddPlace("goldOre", 1, 1);

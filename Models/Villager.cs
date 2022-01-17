@@ -35,6 +35,11 @@ namespace Others.Models
     [JsonProperty("mapPoint")]
     public Point MapPoint { get; set; }
 
+    [JsonProperty("path")]
+    public List<Point> Path { get; set; } = new List<Point>();
+
+    public Vector2 Position { get; set; }
+
     [JsonProperty("skills")]
     public Dictionary<string, float> Skills { get; set; }
 
@@ -76,7 +81,7 @@ namespace Others.Models
       return VillagerStates.Idle;
     }
 
-    public VillagerStates States { get; private set; }
+    public VillagerStates State => GetState();
 
     public void SetCurrentTask(GameWorldManager gwm)
     {
@@ -275,11 +280,52 @@ namespace Others.Models
     {
       var place = GetCurrentPlace(gwm);
 
-      if (IsAtPlace(place))
+      if (Path.Count == 0)
+      {
+        Path = gwm.Pathfinder.GetPathNextTo(MapPoint, place.Point);
+      }
+
+      // Notice how this isn't and else if (that was intentional)
+      if (Path.Count > 0)
+      {
+        var nextPoint = Path[0];
+
+        var speed = 1f;
+
+        if (nextPoint.X > MapPoint.X) // Go right
+        {
+          Position = new Vector2(Position.X + speed, Position.Y);
+        }
+        else if (nextPoint.X < MapPoint.X) // Go Left
+        {
+          Position = new Vector2(Position.X - speed, Position.Y);
+        }
+        else if (nextPoint.Y > MapPoint.Y) // Go down
+        {
+          Position = new Vector2(Position.X, Position.Y + speed);
+        }
+        else if (nextPoint.Y < MapPoint.Y) // Go up
+        {
+          Position = new Vector2(Position.X, Position.Y - speed);
+        }
+
+        var distance = Vector2.Distance(Position, nextPoint.ToVector2());
+        var pos = Position / Game1.TileSize;
+
+        if (Helpers.NearlyEqual(pos, nextPoint.ToVector2()))
+        {
+          Path.RemoveAt(0);
+          MapPoint = nextPoint;
+          //Position = MapPoint.ToVector2();
+        }
+      }
+
+      if (Path.Count == 0)
       {
         CurrentPlaceId = place.Id;
         Console.WriteLine($"{Name} is now at {place.Name}");
         CurrentTask = null;
+        Path = new List<Point>();
       }
 
       _taskTimer = 0;

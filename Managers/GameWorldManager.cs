@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using ZonerEngine.GL;
+using ZonerEngine.GL.Maps;
 
 namespace Others.Managers
 {
@@ -17,6 +18,15 @@ namespace Others.Managers
     public static Dictionary<string, string> Statics = new Dictionary<string, string>();
 
     public GameWorld GameWorld { get; set; }
+
+    public readonly Pathfinder Pathfinder;
+
+    public List<int> RemovedPlaces { get; private set; } = new List<int>();
+
+    public GameWorldManager(Map map)
+    {
+      Pathfinder = new Pathfinder(map);
+    }
 
     public int GetId(string dataType)
     {
@@ -156,10 +166,14 @@ namespace Others.Managers
 
     private void UpdatePlaces()
     {
+      RemovedPlaces = new List<int>();
       for (int i = 0; i < GameWorld.Places.Count; i++)
       {
         if (GameWorld.Places[i].IsRemoved)
+        {
           GameWorld.Places.RemoveAt(i);
+          RemovedPlaces.Add(GameWorld.Places[i].Id);
+        }
       }
     }
 
@@ -192,7 +206,7 @@ namespace Others.Managers
       }
     }
 
-    private PlaceWrapper GetPlaceById(int id)
+    public PlaceWrapper GetPlaceById(int id)
     {
       return GameWorld.Places.FirstOrDefault(
                       c => c.Id == id);

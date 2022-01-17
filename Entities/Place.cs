@@ -12,7 +12,7 @@ namespace Others.Entities
 {
   public class Place : Entity
   {
-    private readonly Models.PlaceWrapper _place;
+    public readonly Models.PlaceWrapper Wrapper;
     /// <summary>
     /// Where the tile is on the map
     /// </summary>
@@ -26,15 +26,15 @@ namespace Others.Entities
 
     public Place(Models.PlaceWrapper place, Texture2D texture, BattleState state)
     {
-      _place = place;
-      _point = new Point(_place.Point.X, _place.Point.Y);
+      Wrapper = place;
+      _point = new Point(Wrapper.Point.X, Wrapper.Point.Y);
       _texture = texture;
       _state = state;
 
       Position = _point.ToVector2() * Game1.TileSize;
 
-      var collisionWidth = Game1.TileSize * _place.Width;
-      var collisionHeight = Game1.TileSize * _place.Height;
+      var collisionWidth = Game1.TileSize * Wrapper.Width;
+      var collisionHeight = Game1.TileSize * Wrapper.Height;
       _collisionTexture = new Texture2D(state.GameModel.GraphicsDevice, collisionWidth, collisionHeight);
       _collisionTexture.SetData<Color>(Helpers.GetBorder(collisionWidth, collisionHeight, 1, Color.Red));
     }
@@ -45,7 +45,7 @@ namespace Others.Entities
 
       AddComponent(new TextureComponent(this, _texture) { Layer = (Layer + (Position + origin).Y / 1000f), PositionOffset = PositionOffset });
       AddComponent(new TextureComponent(this, _collisionTexture, () => _state.ShowCollisionBox) { Layer = 0.96f, });
-      AddComponent(new MappedComponent(this, '1', () => new Rectangle(_point.X, _point.Y, _place.Width, _place.Height)));
+      AddComponent(new MappedComponent(this, '1', () => new Rectangle(_point.X, _point.Y, Wrapper.Width, Wrapper.Height)));
     }
   }
 }

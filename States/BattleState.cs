@@ -35,6 +35,8 @@ namespace Others.States
 
     public PathManager PathManager { get; set; }
 
+    public Pathfinder Pathfinder { get; private set; }
+
     public BattleState(GameModel gameModel)
       : base(gameModel)
     {
@@ -42,8 +44,6 @@ namespace Others.States
 
     public override void LoadContent()
     {
-      _gwm = new GameWorldManager();
-      _gwm.Load("save.json");
 
       //var mapData = File.ReadAllLines("Maps/Map_001.txt").Select(c => c.ToArray()).ToList();
 
@@ -61,11 +61,16 @@ namespace Others.States
         }
       }
 
+      Pathfinder = new Pathfinder(_map);
+
+      _gwm = new GameWorldManager(_map);
+      _gwm.Load("save.json");
+
       var villagerTexture = _content.Load<Texture2D>($"Villager");
 
       foreach (var villager in _gwm.GameWorld.Villagers)
       {
-        var villagerEntity = new Villager(villager, villagerTexture, this) { PositionOffset = new Vector2(0, -Game1.TileSize) };
+        var villagerEntity = new Villager(villager, villagerTexture, this, _gwm) { PositionOffset = new Vector2(0, -Game1.TileSize) };
         _entities.Add(villagerEntity);
       }
 
@@ -121,28 +126,6 @@ namespace Others.States
 
       _gwm.Update();
 
-      /*PreviousMousePosition = CurrentMousePosition;
-      CurrentMousePosition = new Point((int)Math.Floor(GameMouse.Position.X / (double)Game1.TileSize), (int)Math.Floor(GameMouse.Position.Y / (double)Game1.TileSize));
-
-      if (PreviousMousePosition != CurrentMousePosition)
-      {
-        Console.WriteLine(CurrentMousePosition);
-        foreach (var path in _entities.Where(c => c is Path))
-        {
-          path.IsRemoved = true;
-        }
-
-        var pf = new Pathfinder(_map);
-        var results = pf.GetPath(new Point(0, 0), CurrentMousePosition);
-
-        foreach (var result in results)
-        {
-          var value = new Path(result.X, result.Y, _content.Load<Texture2D>("Path/Last_Outer"));
-          value.LoadContent();
-          _entities.Add(value);
-        }
-      }*/
-
       PathManager.Update(gameTime);
 
       foreach (var entity in _entities)
@@ -150,8 +133,21 @@ namespace Others.States
 
       for (int i = 0; i < _entities.Count; i++)
       {
-        if (_entities[i].IsRemoved)
+        var entity = _entities[i];
+        if (entity is Place place)
         {
+          if (place.Wrapper.IsRemoved)
+          {
+            entity.IsRemoved = true;
+          }
+        }
+
+        if (entity.IsRemoved)
+        {
+          var mappedComponent = entity.GetComponent<MappedComponent>();
+          if (mappedComponent != null)
+            _map.Remove(mappedComponent);
+
           _entities.RemoveAt(i);
           i--;
         }

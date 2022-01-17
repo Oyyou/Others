@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Others.Managers;
 using Others.States;
 using System;
 using System.Collections.Generic;
@@ -20,17 +21,19 @@ namespace Others.Entities
     private readonly Point _point;
     private Texture2D _texture;
     private readonly BattleState _state;
+    private readonly GameWorldManager _gwm;
 
     private Texture2D _collisionTexture;
 
     public Vector2 PositionOffset = Vector2.Zero;
 
-    public Villager(Models.Villager villager, Texture2D texture, BattleState state)
+    public Villager(Models.Villager villager, Texture2D texture, BattleState state, GameWorldManager gwm)
     {
       _villager = villager;
       _point = new Point(_villager.MapPoint.X, _villager.MapPoint.Y);
       _texture = texture;
       _state = state;
+      _gwm = gwm;
 
       Position = _point.ToVector2() * Game1.TileSize;
 
@@ -51,10 +54,7 @@ namespace Others.Entities
 
     public void Move(GameTime gameTime, List<Entity> entities)
     {
-      if (_villager.States != Models.Villager.VillagerStates.Idle)
-      {
-
-      }
+      Position = _villager.Position;
     }
   }
 }

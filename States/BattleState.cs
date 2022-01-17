@@ -138,25 +138,6 @@ namespace Others.States
       if (GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.S))
         _gwm.Save("save.json");
 
-      if (GameMouse.IsLeftClicked)
-      {
-        VillagerDetails.SetVillager(null);
-        foreach (Villager villager in _entities.Where(c => c is Villager))
-        {
-          villager.IsSelected = false;
-
-          if (GameMouse.Intersects(new Rectangle((int)villager.Position.X, (int)villager.Position.Y, 40, 40)))
-          {
-            villager.IsSelected = !villager.IsSelected;
-          }
-
-          if (villager.IsSelected)
-          {
-            VillagerDetails.SetVillager(villager.Wrapper);
-          }
-        }
-      }
-
       _gwm.Update();
 
       //PathManager.Update(gameTime);
@@ -183,6 +164,15 @@ namespace Others.States
 
           _entities.RemoveAt(i);
           i--;
+        }
+      }
+
+      VillagerDetails.SetVillager(null);
+      foreach (Villager villager in _entities.Where(c => c is Villager))
+      {
+        if (villager.IsSelected)
+        {
+          VillagerDetails.SetVillager(villager.Wrapper);
         }
       }
     }

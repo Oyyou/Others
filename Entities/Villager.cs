@@ -13,7 +13,7 @@ namespace Others.Entities
 {
   public class Villager : Entity
   {
-    private readonly Models.Villager _villager;
+    public Models.Villager Wrapper;
 
     /// <summary>
     /// Where the tile is on the map
@@ -25,12 +25,18 @@ namespace Others.Entities
 
     private Texture2D _collisionTexture;
 
+    private Texture2D _selectedTexture;
+
     public Vector2 PositionOffset = Vector2.Zero;
+
+    public bool IsSelected { get; set; } = false;
+
+    public bool IsHovering { get; set; } = false;
 
     public Villager(Models.Villager villager, Texture2D texture, BattleState state, GameWorldManager gwm)
     {
-      _villager = villager;
-      _point = new Point(_villager.MapPoint.X, _villager.MapPoint.Y);
+      Wrapper = villager;
+      _point = new Point(Wrapper.MapPoint.X, Wrapper.MapPoint.Y);
       _texture = texture;
       _state = state;
       _gwm = gwm;
@@ -41,20 +47,24 @@ namespace Others.Entities
       var collisionHeight = texture.Height / (texture.Height / Game1.TileSize);
       _collisionTexture = new Texture2D(state.GameModel.GraphicsDevice, collisionWidth, collisionHeight);
       _collisionTexture.SetData<Color>(Helpers.GetBorder(collisionWidth, collisionHeight, 1, Color.Red));
+
+      _selectedTexture = new Texture2D(state.GameModel.GraphicsDevice, collisionWidth, collisionHeight);
+      _selectedTexture.SetData<Color>(Helpers.GetBorder(collisionWidth, collisionHeight, 1, Color.Yellow));
     }
 
     public override void LoadContent()
     {
       var origin = new Vector2(_texture.Width / 2, _texture.Height / 2);
 
-      AddComponent(new TextureComponent(this, _texture) { Layer = (Layer + (Position + origin).Y / 1000f), PositionOffset = PositionOffset, GetLayer = () => { var value = (Layer + (Position + origin).Y / 1000f); Console.WriteLine(value); return value; } });
+      AddComponent(new TextureComponent(this, _texture) { Layer = (Layer + (Position + origin).Y / 1000f), PositionOffset = PositionOffset, GetLayer = () => { var value = (Layer + (Position + origin).Y / 1000f); return value; } });
       AddComponent(new TextureComponent(this, _collisionTexture, () => _state.ShowCollisionBox) { Layer = 0.96f, });
+      AddComponent(new TextureComponent(this, _selectedTexture, () => IsSelected) { Layer = 0.961f, });
       AddComponent(new MoveComponent(this, Move));
     }
 
     public void Move(GameTime gameTime, List<Entity> entities)
     {
-      Position = _villager.Position;
+      Position = Wrapper.Position;
     }
   }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Others.Entities;
+using Others.GUI.VillagerDetails;
 using Others.Managers;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,8 @@ namespace Others.States
 
     private GameWorldManager _gwm;
 
+    private SpriteFont _font;
+
     public bool ShowGrid { get; private set; } = false;
 
     public bool ShowCollisionBox { get; private set; } = false;
@@ -37,6 +40,10 @@ namespace Others.States
 
     public Pathfinder Pathfinder { get; private set; }
 
+    #region GUI Stuff
+    public Panel VillagerDetails;
+    #endregion
+
     public BattleState(GameModel gameModel)
       : base(gameModel)
     {
@@ -44,7 +51,7 @@ namespace Others.States
 
     public override void LoadContent()
     {
-
+      _font = _content.Load<SpriteFont>("Font");
       //var mapData = File.ReadAllLines("Maps/Map_001.txt").Select(c => c.ToArray()).ToList();
 
       _map = new Map(40, 40, '0');
@@ -57,7 +64,7 @@ namespace Others.States
         {
           var value = _map.Data[y, x];
 
-         // _entities.Add(new Tile(x, y, tileTexture, this));
+          // _entities.Add(new Tile(x, y, tileTexture, this));
         }
       }
 
@@ -81,14 +88,14 @@ namespace Others.States
           var texture = _content.Load<Texture2D>($"Places/{place.Name}");
           var xOffset = place.XOriginPercentage != 0 ? (place.XOriginPercentage / 100f) * texture.Width : 0;
           var yOffset = place.YOriginPercentage != 0 ? (place.YOriginPercentage / 100f) * texture.Height : 0;
-          if(xOffset != 0)
+          if (xOffset != 0)
           {
 
           }
           var placeEntity = new Place(place, texture, this) { Layer = 0.09f, PositionOffset = new Vector2(xOffset, yOffset), };
           _entities.Add(placeEntity);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
 
         }
@@ -108,6 +115,10 @@ namespace Others.States
 
       PathManager = new PathManager(_map);
       PathManager.LoadContent(_content);
+
+      #region GUI Stuff
+      VillagerDetails = new Panel(_content);
+      #endregion
     }
 
     public override void UnloadContent()
@@ -124,9 +135,31 @@ namespace Others.States
       if (GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.C))
         ShowCollisionBox = !ShowCollisionBox;
 
+      if (GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.S))
+        _gwm.Save("save.json");
+
+      if (GameMouse.IsLeftClicked)
+      {
+        VillagerDetails.SetVillager(null);
+        foreach (Villager villager in _entities.Where(c => c is Villager))
+        {
+          villager.IsSelected = false;
+
+          if (GameMouse.Intersects(new Rectangle((int)villager.Position.X, (int)villager.Position.Y, 40, 40)))
+          {
+            villager.IsSelected = !villager.IsSelected;
+          }
+
+          if (villager.IsSelected)
+          {
+            VillagerDetails.SetVillager(villager.Wrapper);
+          }
+        }
+      }
+
       _gwm.Update();
 
-      PathManager.Update(gameTime);
+      //PathManager.Update(gameTime);
 
       foreach (var entity in _entities)
         entity.Update(gameTime, _entities);
@@ -163,7 +196,14 @@ namespace Others.States
       foreach (var entity in _entities)
         entity.Draw(gameTime, _spriteBatch);
 
-      PathManager.Draw(gameTime, _spriteBatch);
+      //PathManager.Draw(gameTime, _spriteBatch);
+
+      _spriteBatch.End();
+
+      _spriteBatch.Begin();
+
+      //_spriteBatch.DrawString(_font, _gwm.GameWorld)
+      VillagerDetails.Draw(_spriteBatch, gameTime);
 
       _spriteBatch.End();
     }

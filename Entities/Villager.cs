@@ -47,7 +47,7 @@ namespace Others.Entities
     {
       var origin = new Vector2(_texture.Width / 2, _texture.Height / 2);
 
-      AddComponent(new TextureComponent(this, _texture) { Layer = (Layer + (Position + origin).Y / 1000f), PositionOffset = PositionOffset });
+      AddComponent(new TextureComponent(this, _texture) { Layer = (Layer + (Position + origin).Y / 1000f), PositionOffset = PositionOffset, GetLayer = () => { var value = (Layer + (Position + origin).Y / 1000f); Console.WriteLine(value); return value; } });
       AddComponent(new TextureComponent(this, _collisionTexture, () => _state.ShowCollisionBox) { Layer = 0.96f, });
       AddComponent(new MoveComponent(this, Move));
     }

@@ -70,7 +70,7 @@ namespace Others.States
 
       foreach (var villager in _gwm.GameWorld.Villagers)
       {
-        var villagerEntity = new Villager(villager, villagerTexture, this, _gwm) { PositionOffset = new Vector2(0, -Game1.TileSize) };
+        var villagerEntity = new Villager(villager, villagerTexture, this, _gwm) { Layer = 0.09f, PositionOffset = new Vector2(0, -Game1.TileSize) };
         _entities.Add(villagerEntity);
       }
 

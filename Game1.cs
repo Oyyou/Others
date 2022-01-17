@@ -30,6 +30,7 @@ namespace Others
 
     protected override void Update(GameTime gameTime)
     {
+      //for(int i =0; i < 5; i++)
       _state.Update(gameTime);
 
       base.Update(gameTime);

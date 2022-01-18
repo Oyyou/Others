@@ -41,7 +41,6 @@ namespace Others.States
     public Pathfinder Pathfinder { get; private set; }
 
     #region GUI Stuff
-    public Panel VillagerDetails;
     public GUI.Panel Panel;
     #endregion
 
@@ -118,7 +117,6 @@ namespace Others.States
       PathManager.LoadContent(_content);
 
       #region GUI Stuff
-      VillagerDetails = new Panel(_content);
       Panel = new GUI.Panel(_content);
       #endregion
     }
@@ -183,15 +181,6 @@ namespace Others.States
           }
         }
       }
-
-      VillagerDetails.SetVillager(null);
-      foreach (Villager villager in _entities.Where(c => c is Villager))
-      {
-        if (villager.IsSelected)
-        {
-          //VillagerDetails.SetVillager(villager.Wrapper);
-        }
-      }
     }
 
     public override void Draw(GameTime gameTime)
@@ -209,8 +198,6 @@ namespace Others.States
 
       _spriteBatch.Begin();
 
-      //_spriteBatch.DrawString(_font, _gwm.GameWorld)
-      VillagerDetails.Draw(_spriteBatch, gameTime);
       Panel.Draw(_spriteBatch, gameTime);
 
       _spriteBatch.End();

@@ -37,6 +37,9 @@ namespace Others.GUI
 
     public void AddSection(string header, params string[] content)
     {
+      if (info.ContainsKey(header))
+        return; // We ain't dealing with that
+
       info.Add(header, content);
     }
 

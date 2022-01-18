@@ -426,6 +426,10 @@ namespace Others.Models
           bed.AdditionalProperties["ownerId"] = this.Id;
         }
       }
+      else
+      {
+        bed = villagersBed;
+      }
 
 
       return bed;

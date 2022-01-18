@@ -42,6 +42,7 @@ namespace Others.States
 
     #region GUI Stuff
     public Panel VillagerDetails;
+    public GUI.Panel Panel;
     #endregion
 
     public BattleState(GameModel gameModel)
@@ -118,6 +119,7 @@ namespace Others.States
 
       #region GUI Stuff
       VillagerDetails = new Panel(_content);
+      Panel = new GUI.Panel(_content);
       #endregion
     }
 
@@ -145,6 +147,7 @@ namespace Others.States
       foreach (var entity in _entities)
         entity.Update(gameTime, _entities);
 
+      Panel.Clear();
       for (int i = 0; i < _entities.Count; i++)
       {
         var entity = _entities[i];
@@ -165,6 +168,20 @@ namespace Others.States
           _entities.RemoveAt(i);
           i--;
         }
+        else
+        {
+          var selectedComponent = entity.GetComponent<SelectableComponent>();
+          if (selectedComponent != null)
+          {
+            if (selectedComponent.IsSelected)
+            {
+              Panel.Clear();
+              Panel.SetMainHeader("Test header");
+              Panel.AddSection("Test subheader 1", "Test value: 1", "Test value: 1");
+              Panel.AddSection("Test subheader 2", "Test value: 2", "Test value: 2");
+            }
+          }
+        }
       }
 
       VillagerDetails.SetVillager(null);
@@ -172,7 +189,7 @@ namespace Others.States
       {
         if (villager.IsSelected)
         {
-          VillagerDetails.SetVillager(villager.Wrapper);
+          //VillagerDetails.SetVillager(villager.Wrapper);
         }
       }
     }
@@ -194,6 +211,7 @@ namespace Others.States
 
       //_spriteBatch.DrawString(_font, _gwm.GameWorld)
       VillagerDetails.Draw(_spriteBatch, gameTime);
+      Panel.Draw(_spriteBatch, gameTime);
 
       _spriteBatch.End();
     }

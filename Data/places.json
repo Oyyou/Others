@@ -4,8 +4,7 @@
       "name": "goldOre",
       "skill": "mining",
       "type": "Collection",
-      "width": 1,
-      "height": 1,
+      "description": "A node for mining gold ore",
       "additionalProperties": {
         "health": 10
       }
@@ -14,6 +13,7 @@
       "name": "smelter",
       "skill": "smithing",
       "type": "Production",
+      "description": "",
       "additionalProperties": {
         "health": 100
       }
@@ -22,6 +22,7 @@
       "name": "storageChest",
       "skill": "",
       "type": "Storage",
+      "description": "",
       "additionalProperties": {
         "capacity": 50
       }
@@ -30,6 +31,7 @@
       "name": "normalTree",
       "skill": "chopping",
       "type": "Collection",
+      "description": "",
       "width": 1,
       "height": 2,
       "xOriginPercentage": -25,
@@ -42,6 +44,7 @@
       "name": "singleBed",
       "skill": "",
       "type": "Sleeping",
+      "description": "When ya bois gotta catch some Zzz's'",
       "xOriginPercentage": 0,
       "yOriginPercentage": -33,
       "additionalProperties": {

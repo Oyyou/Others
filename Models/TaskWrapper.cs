@@ -23,7 +23,7 @@ namespace Others.Models
     public byte Priority;
 
     [JsonIgnore]
-    public Task Task { get; private set; }
+    public Task Data { get; private set; }
 
     public TaskWrapper()
     {
@@ -32,14 +32,14 @@ namespace Others.Models
 
     public void LoadFromData(Task task)
     {
-      Task = task;
-      Name = Task.Name;
+      Data = task;
+      Name = Data.Name;
       //Priority = (byte)Math.Clamp(priority, 1, 5);
     }
 
     public void LoadFromSave(Task task)
     {
-      Task = task;
+      Data = task;
     }
   }
 }

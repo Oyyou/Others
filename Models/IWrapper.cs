@@ -6,6 +6,8 @@ namespace Others.Models
 {
   public interface IWrapper<T>
   {
+    T Data { get; }
+
     /// <summary>
     /// When the object is initially created it has to load the {data}.json
     /// </summary>

@@ -53,7 +53,7 @@ namespace Others.Managers
 
     public bool AssignTask(TaskWrapper task)
     {
-      var requiredSkills = task.Task.SkillRequirements;
+      var requiredSkills = task.Data.SkillRequirements;
       List<Villager> capableVillagers = new List<Villager>();
       foreach (var villager in GameWorld.Villagers)
       {
@@ -229,7 +229,7 @@ namespace Others.Managers
     public Dictionary<string, int> GetInventory()
     {
       var value = GameWorld.Places
-        .Where(c => c.Place.Type == "Storage" && c.AdditionalProperties.ContainsKey("inventory"))
+        .Where(c => c.Data.Type == "Storage" && c.AdditionalProperties.ContainsKey("inventory"))
         .SelectMany(c => c.AdditionalProperties["inventory"].ToDictionary<string, int>())
         .GroupBy(c => c.Key)
         .ToDictionary(c => c.Key, v => v.Sum(b => b.Value));
@@ -300,14 +300,14 @@ namespace Others.Managers
       AddPlace("goldOre", 5, 1);
       AddPlace("goldOre", 5, 6);
       AddPlace("goldOre", 7, 2);
-      AddPlace("goldOre", 8, 4);
+      AddPlace("goldOre", 10, 4);
       AddPlace("goldOre", 5, 8);
       AddPlace("goldOre", 1, 4);
       AddPlace("goldOre", 2, 2);
 
       AddPlace("normalTree", 3, 1);
 
-      foreach (var place in GameWorld.Places.Where(c => c.Place.Skill == "mining"))
+      foreach (var place in GameWorld.Places.Where(c => c.Data.Skill == "mining"))
       {
         AddTask("miningGold", 1, place.Id);
       }
@@ -319,6 +319,7 @@ namespace Others.Managers
 
       AddPlace("storageChest", 5, 5);
       AddPlace("singleBed", 6, 5);
+      AddPlace("singleBed", 8, 5);
     }
 
     /// <summary>
@@ -326,7 +327,6 @@ namespace Others.Managers
     /// </summary>
     private void LoadData()
     {
-
       var staticFiles = Directory.GetFiles("Data/", "statics.json");
 
       foreach (var staticFile in staticFiles)

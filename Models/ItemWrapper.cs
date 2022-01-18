@@ -16,7 +16,7 @@ namespace Others.Models
     public int Count { get; set; }
 
     [JsonIgnore]
-    public Item Item { get; set; }
+    public Item Data { get; set; }
 
     /// <summary>
     /// This is the combined weight of this stack
@@ -26,7 +26,7 @@ namespace Others.Models
     { 
       get
       {
-        return Item.Weight * Count;
+        return Data.Weight * Count;
       }
     }
 
@@ -37,13 +37,13 @@ namespace Others.Models
 
     public void LoadFromData(Item item)
     {
-      Item = item;
-      Name = Item.Name;
+      Data = item;
+      Name = Data.Name;
     }
 
     public void LoadFromSave(Item item)
     {
-      Item = item;
+      Data = item;
     }
   }
 }

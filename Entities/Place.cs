@@ -18,11 +18,18 @@ namespace Others.Entities
     /// </summary>
     private readonly Point _point;
     private Texture2D _texture;
+    private Rectangle _rectangle;
     private readonly BattleState _state;
 
     private Texture2D _collisionTexture;
+    private Texture2D _selectedTexture;
+    private Texture2D _hoveringTexture;
 
     public Vector2 PositionOffset = Vector2.Zero;
+
+    public bool IsSelected { get; set; } = false;
+
+    public bool IsHovering { get; set; } = false;
 
     public Place(Models.PlaceWrapper place, Texture2D texture, BattleState state)
     {
@@ -33,10 +40,19 @@ namespace Others.Entities
 
       Position = _point.ToVector2() * Game1.TileSize;
 
-      var collisionWidth = Game1.TileSize * Wrapper.Width;
-      var collisionHeight = Game1.TileSize * Wrapper.Height;
+      var collisionWidth = Game1.TileSize * Wrapper.Data.Width;
+      var collisionHeight = Game1.TileSize * Wrapper.Data.Height;
+
+      _rectangle = new Rectangle((int)Position.X, (int)Position.Y, collisionWidth, collisionHeight);
+
       _collisionTexture = new Texture2D(state.GameModel.GraphicsDevice, collisionWidth, collisionHeight);
       _collisionTexture.SetData<Color>(Helpers.GetBorder(collisionWidth, collisionHeight, 1, Color.Red));
+
+      _selectedTexture = new Texture2D(state.GameModel.GraphicsDevice, collisionWidth, collisionHeight);
+      _selectedTexture.SetData<Color>(Helpers.GetBorder(collisionWidth, collisionHeight, 1, Color.Yellow));
+
+      _hoveringTexture = new Texture2D(state.GameModel.GraphicsDevice, collisionWidth, collisionHeight);
+      _hoveringTexture.SetData<Color>(Helpers.GetBorder(collisionWidth, collisionHeight, 1, Color.Gray));
     }
 
     public override void LoadContent()
@@ -45,7 +61,28 @@ namespace Others.Entities
 
       AddComponent(new TextureComponent(this, _texture) { Layer = (Layer + (Position + origin).Y / 1000f), PositionOffset = PositionOffset });
       AddComponent(new TextureComponent(this, _collisionTexture, () => _state.ShowCollisionBox) { Layer = 0.96f, });
-      AddComponent(new MappedComponent(this, '1', () => new Rectangle(_point.X, _point.Y, Wrapper.Width, Wrapper.Height)));
+      AddComponent(new TextureComponent(this, _hoveringTexture, () => IsHovering) { Layer = 0.961f, });
+      AddComponent(new TextureComponent(this, _selectedTexture, () => IsSelected) { Layer = 0.962f, });
+      AddComponent(new MappedComponent(this, '1', () => new Rectangle(_point.X, _point.Y, Wrapper.Data.Width, Wrapper.Data.Height)));
+      AddComponent(new SelectableComponent(this, () => _rectangle)
+      {
+        OnHover = () =>
+        {
+          IsHovering = true;
+        },
+        OffHover = () =>
+        {
+          IsHovering = false;
+        },
+        OnSelected = () =>
+        {
+          IsSelected = true;
+        },
+        OffSelected = () =>
+        {
+          IsSelected = false;
+        }
+      });
     }
   }
 }

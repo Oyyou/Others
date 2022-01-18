@@ -86,8 +86,8 @@ namespace Others.States
         try
         {
           var texture = _content.Load<Texture2D>($"Places/{place.Name}");
-          var xOffset = place.XOriginPercentage != 0 ? (place.XOriginPercentage / 100f) * texture.Width : 0;
-          var yOffset = place.YOriginPercentage != 0 ? (place.YOriginPercentage / 100f) * texture.Height : 0;
+          var xOffset = place.Data.XOriginPercentage != 0 ? (place.Data.XOriginPercentage / 100f) * texture.Width : 0;
+          var yOffset = place.Data.YOriginPercentage != 0 ? (place.Data.YOriginPercentage / 100f) * texture.Height : 0;
           if (xOffset != 0)
           {
 

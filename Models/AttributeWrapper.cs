@@ -16,7 +16,7 @@ namespace Others.Models
     public float Total { get; set; }
 
     [JsonIgnore]
-    public Attribute Attribute { get; set; }
+    public Attribute Data { get; set; }
 
     public AttributeWrapper()
     {
@@ -25,14 +25,14 @@ namespace Others.Models
 
     public void LoadFromData(Attribute attribute)
     {
-      Attribute = attribute;
-      Name = Attribute.Name;
-      Total = Attribute.Total;
+      Data = attribute;
+      Name = Data.Name;
+      Total = Data.Total;
     }
 
     public void LoadFromSave(Attribute attribute)
     {
-      Attribute = attribute;
+      Data = attribute;
     }
   }
 }

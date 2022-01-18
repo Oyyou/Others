@@ -38,6 +38,7 @@ namespace Others.Models
     [JsonProperty("path")]
     public List<Point> Path { get; set; } = new List<Point>();
 
+    [JsonProperty("position")]
     public Vector2 Position { get; set; }
 
     [JsonProperty("skills")]
@@ -128,7 +129,7 @@ namespace Others.Models
     public void DoTask(GameWorldManager gwm)
     {
       var place = gwm.GameWorld.Places.FirstOrDefault(c => c.Id == CurrentTask.PlaceId);
-      MethodInfo magicMethod = this.GetType().GetMethod($"Do{CurrentTask.Task.Type}Task");
+      MethodInfo magicMethod = this.GetType().GetMethod($"Do{CurrentTask.Data.Type}Task");
       magicMethod.Invoke(this, new object[] { gwm });
 
       CheckStorage(gwm);
@@ -159,7 +160,7 @@ namespace Others.Models
     private void SetStorageTask(GameWorldManager gwm)
     {
       // Gets all the storage places 
-      var storagePlaces = gwm.GameWorld.Places.Where(c => c.Place.Type == "Storage");
+      var storagePlaces = gwm.GameWorld.Places.Where(c => c.Data.Type == "Storage");
 
       var taskData = gwm.GameWorld.TaskData["storingItems"];
 
@@ -179,14 +180,14 @@ namespace Others.Models
 
       _taskTimer += 0.01f;
 
-      if (_taskTimer > CurrentTask.Task.Rate)
+      if (_taskTimer > CurrentTask.Data.Rate)
       {
         _taskTimer = 0;
 
         var rand = GameWorldManager.Random.NextDouble();
 
         var chance = 0.0f;
-        foreach (var item in CurrentTask.Task.ProducedItems)
+        foreach (var item in CurrentTask.Data.ProducedItems)
         {
           chance += item.Chance;
 
@@ -222,7 +223,7 @@ namespace Others.Models
 
     public void DoSleepingTask(GameWorldManager gwm)
     {
-      if (Attributes["energy"].Total >= Attributes["energy"].Attribute.Total)
+      if (Attributes["energy"].Total >= Attributes["energy"].Data.Total)
       {
         CurrentTask = null;
       }
@@ -345,25 +346,25 @@ namespace Others.Models
         var attr = attrKvp.Value;
         if (CurrentTask != null)
         {
-          var taskType = CurrentTask.Task.Type;
+          var taskType = CurrentTask.Data.Type;
 
-          if (attr.Attribute.PositiveTasks.ContainsKey(taskType))
+          if (attr.Data.PositiveTasks.ContainsKey(taskType))
           {
 
-            attr.Total += attr.Attribute.PositiveTasks[taskType];
+            attr.Total += attr.Data.PositiveTasks[taskType];
           }
 
-          if (attr.Attribute.NegativeTasks.ContainsKey(taskType))
+          if (attr.Data.NegativeTasks.ContainsKey(taskType))
           {
 
-            attr.Total -= attr.Attribute.NegativeTasks[taskType];
+            attr.Total -= attr.Data.NegativeTasks[taskType];
           }
 
           if (attr.Total < 0)
             attr.Total = 0;
 
-          if (attr.Total > attr.Attribute.Total)
-            attr.Total = attr.Attribute.Total;
+          if (attr.Total > attr.Data.Total)
+            attr.Total = attr.Data.Total;
 
           //attr.Total = Math.Clamp(attr.Total, 0, attr.Attribute.Total);
         }
@@ -376,7 +377,7 @@ namespace Others.Models
       {
         if (attribute.Value.Total <= 0)
         {
-          var taskData = gwm.GameWorld.TaskData[attribute.Value.Attribute.TaskType];
+          var taskData = gwm.GameWorld.TaskData[attribute.Value.Data.TaskType];
           if (Tasks.Any(c => c.Name == taskData.Name))
           {
             // Move the task so it's always 2nd?                  
@@ -389,16 +390,45 @@ namespace Others.Models
               CurrentTask = null;
             }
 
-            var sleepingPlaces = gwm.GameWorld.Places.Where(c => c.Place.Type == taskData.Type);
+            var bed = GetBed(gwm, taskData.Type);
 
             var task = new TaskWrapper();
-            task.PlaceId = sleepingPlaces.FirstOrDefault().Id;
+            task.PlaceId = bed != null ? bed.Id : this.Id;
             task.LoadFromData(taskData);
 
             Tasks.Insert(0, task);
           }
         }
       }
+    }
+
+    private PlaceWrapper GetBed(GameWorldManager gwm, string taskType)
+    {
+      PlaceWrapper bed = null;
+
+      var beds = gwm.GameWorld.Places.Where(c => c.Data.Type == taskType);
+      var villagersBed = beds.FirstOrDefault(c => (long)c.AdditionalProperties["ownerId"] == this.Id);
+
+      // If the villager doesn't have a bed =(
+      if (villagersBed == null)
+      {
+        var availableBeds = beds.Where(c => (long)c.AdditionalProperties["ownerId"] == -1);
+
+        // If there are no available beds anywhere =(((((
+        if (availableBeds.Count() == 0)
+        {
+          bed = null;
+        }
+        else
+        {
+          // Get the bed closest
+          bed = availableBeds.OrderBy(c => Vector2.Distance(c.Point.ToVector2(), this.MapPoint.ToVector2())).FirstOrDefault();
+          bed.AdditionalProperties["ownerId"] = this.Id;
+        }
+      }
+
+
+      return bed;
     }
 
     private PlaceWrapper GetCurrentPlace(GameWorldManager gwm)

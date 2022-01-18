@@ -20,11 +20,17 @@ namespace Others.Models
     [JsonProperty("type")]
     public string Type { get; set; }
 
+    /// <summary>
+    /// A description of the place
+    /// </summary>
+    [JsonProperty("description")]
+    public string Description { get; set; }
+
     [JsonProperty("width")]
-    public int Width { get; set; }
+    public int Width { get; set; } = 1;
 
     [JsonProperty("height")]
-    public int Height { get; set; }
+    public int Height { get; set; } = 1;
 
     [JsonProperty("xOriginPercentage")]
     public int XOriginPercentage { get; set; }

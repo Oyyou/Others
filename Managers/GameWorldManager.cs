@@ -127,6 +127,18 @@ namespace Others.Managers
       return place;
     }
 
+    /*public ItemWrapper AddGatherableItem(string itemName, int x, int y)
+    {
+      if(!GameWorld.ItemData.ContainsKey(itemName))
+      {
+        Console.WriteLine($"{itemName}");
+        throw new Exception("Da hell is this item supposed to be!?");
+      }
+
+      var item = new ItemWrapper();
+      item.Id = GetId("item");
+    }*/
+
     public void DeletePlaceById(int id)
     {
       for (int i = 0; i < GameWorld.Places.Count; i++)
@@ -304,6 +316,8 @@ namespace Others.Managers
       AddPlace("goldOre", 5, 8);
       AddPlace("goldOre", 1, 4);
       AddPlace("goldOre", 2, 2);
+
+      AddPlace("rocks", 1, 2);
 
       AddPlace("normalTree", 3, 1);
 

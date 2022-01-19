@@ -277,6 +277,11 @@ namespace Others.Models
       CurrentTask = null;
     }
 
+    public void DoGatheringTask(GameWorldManager gwm)
+    {
+
+    }
+
     public void DoTravellingTask(GameWorldManager gwm)
     {
       var place = GetCurrentPlace(gwm);

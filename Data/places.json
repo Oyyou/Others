@@ -5,15 +5,23 @@
       "skill": "mining",
       "type": "Collection",
       "description": "A node for mining gold ore",
+      "collisionType": "Full",
       "additionalProperties": {
         "health": 10
       }
+    },
+    {
+      "name": "rocks",
+      "type": "Gathering",
+      "description": "Just some rocks on the floor",
+      "collisionType": "None"
     },
     {
       "name": "smelter",
       "skill": "smithing",
       "type": "Production",
       "description": "",
+      "collisionType": "Full",
       "additionalProperties": {
         "health": 100
       }
@@ -23,6 +31,7 @@
       "skill": "",
       "type": "Storage",
       "description": "",
+      "collisionType": "Full",
       "additionalProperties": {
         "capacity": 50
       }
@@ -32,6 +41,7 @@
       "skill": "chopping",
       "type": "Collection",
       "description": "",
+      "collisionType": "Full",
       "width": 1,
       "height": 2,
       "xOriginPercentage": -25,
@@ -45,6 +55,7 @@
       "skill": "",
       "type": "Sleeping",
       "description": "When ya bois gotta catch some Zzz's'",
+      "collisionType": "Full",
       "xOriginPercentage": 0,
       "yOriginPercentage": -33,
       "additionalProperties": {
@@ -63,6 +74,7 @@
       "name": "idleSpot",
       "skill": "",
       "type": "Idle",
+      "collisionType": "None",
       "additionalProperties": {
       }
     }

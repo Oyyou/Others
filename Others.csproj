@@ -53,6 +53,9 @@
     <None Update="Data\Tasks\idle-task.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Data\Tasks\gatherResources-task.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Data\Tasks\miningGold-task.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

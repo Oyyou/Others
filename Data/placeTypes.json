@@ -4,6 +4,7 @@
     "Sleeping",
     "Idle",
     "Storage",
-    "Production"
+    "Production",
+    "Gathering"
   ]
 }

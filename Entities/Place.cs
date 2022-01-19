@@ -60,10 +60,11 @@ namespace Others.Entities
       var origin = new Vector2(_texture.Width / 2, _texture.Height / 2);
 
       AddComponent(new TextureComponent(this, _texture) { Layer = (Layer + (Position + origin).Y / 1000f), PositionOffset = PositionOffset });
-      AddComponent(new TextureComponent(this, _collisionTexture, () => _state.ShowCollisionBox) { Layer = 0.96f, });
+      if (Wrapper.Data.CollisionType == Models.Place.CollisionTypes.Full)
+        AddComponent(new TextureComponent(this, _collisionTexture, () => _state.ShowCollisionBox) { Layer = 0.96f, });
       AddComponent(new TextureComponent(this, _hoveringTexture, () => IsHovering) { Layer = 0.961f, });
       AddComponent(new TextureComponent(this, _selectedTexture, () => IsSelected) { Layer = 0.962f, });
-      AddComponent(new MappedComponent(this, '1', () => new Rectangle(_point.X, _point.Y, Wrapper.Data.Width, Wrapper.Data.Height)));
+      AddComponent(new MappedComponent(this, Wrapper.Data.CollisionType == Models.Place.CollisionTypes.Full ? '1' : '0', () => new Rectangle(_point.X, _point.Y, Wrapper.Data.Width, Wrapper.Data.Height)));
       AddComponent(new SelectableComponent(this, () => _rectangle)
       {
         OnHover = () =>

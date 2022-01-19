@@ -11,6 +11,14 @@
     {
       "name": "normalLog",
       "weight": 0.3
+    },
+    {
+      "name": "rock",
+      "weight": 0.1
+    },
+    {
+      "name": "stick",
+      "weight": 0.1
     }
   ]
 }

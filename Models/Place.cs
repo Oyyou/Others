@@ -8,6 +8,12 @@ namespace Others.Models
 {
   public class Place : ICloneable
   {
+    public enum CollisionTypes
+    {
+      None,
+      Full,
+    }
+
     [JsonProperty("name")]
     public string Name { get; set; }
 
@@ -25,6 +31,9 @@ namespace Others.Models
     /// </summary>
     [JsonProperty("description")]
     public string Description { get; set; }
+
+    [JsonProperty("collisionType")]
+    public CollisionTypes CollisionType { get; set; }
 
     [JsonProperty("width")]
     public int Width { get; set; } = 1;

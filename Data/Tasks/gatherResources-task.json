@@ -1,0 +1,10 @@
+{
+  "name": "gatherResources",
+  "rate": 1,
+  "type": "Gathering",
+  "skillRequirements": [
+    {
+
+    }
+  ]
+}

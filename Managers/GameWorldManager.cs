@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using Others.Models;
+using Others.States;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,6 +14,8 @@ namespace Others.Managers
 {
   public class GameWorldManager
   {
+    private BattleState _state;
+
     public static Random Random = new Random();
 
     public static Dictionary<string, string> Statics = new Dictionary<string, string>();
@@ -23,9 +26,10 @@ namespace Others.Managers
 
     public List<int> RemovedPlaces { get; private set; } = new List<int>();
 
-    public GameWorldManager(Map map)
+    public GameWorldManager(BattleState state)
     {
-      Pathfinder = new Pathfinder(map);
+      _state = state;
+      Pathfinder = new Pathfinder(_state.Map);
     }
 
     public int GetId(string dataType)
@@ -125,6 +129,32 @@ namespace Others.Managers
       GameWorld.Places.Add(place);
 
       return place;
+    }
+
+    public PlaceWrapper AddPlace(string placeName, Point point)
+    {
+      return this.AddPlace(placeName, point.X, point.Y);
+    }
+
+    /// <summary>
+    /// Adds a gatherable place in a random location
+    /// ##warning if you trigger this multiple times in a row, you can hit the same point > 1 time(s)
+    /// </summary>
+    /// <param name="placeName"></param>
+    /// <returns></returns>
+    public void AddGatherablePlace(string placeName, int amount = 1)
+    {
+      var emptyPoints = _state.Map.GetEmptyPoints().ToList();
+
+      for (int i = 0; i < amount; i++)
+      {
+        var index = Random.Next(0, emptyPoints.Count);
+        var randomPoint = emptyPoints[index];
+
+        AddPlace(placeName, randomPoint);
+
+        emptyPoints.RemoveAt(index);        
+      }
     }
 
     /*public ItemWrapper AddGatherableItem(string itemName, int x, int y)

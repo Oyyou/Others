@@ -20,11 +20,12 @@ namespace Others.States
 {
   public class BattleState : State
   {
-    private Map _map;
+    public Map Map { get; private set; }
 
     private List<Entity> _entities = new List<Entity>();
 
     private GameWorldManager _gwm;
+    private GatherableResourcesManager _grm;
 
     private SpriteFont _font;
 
@@ -54,31 +55,33 @@ namespace Others.States
       _font = _content.Load<SpriteFont>("Font");
       //var mapData = File.ReadAllLines("Maps/Map_001.txt").Select(c => c.ToArray()).ToList();
 
-      _map = new Map(40, 40, '0');
+      Map = new Map(40, 40, '0');
 
       var tileTexture = _content.Load<Texture2D>("Tiles/Floor");
       var crateTexture = _content.Load<Texture2D>("Cover/Crate");
-      for (int y = 0; y < _map.Height; y++)
+      for (int y = 0; y < Map.Height; y++)
       {
-        for (int x = 0; x < _map.Width; x++)
+        for (int x = 0; x < Map.Width; x++)
         {
-          var value = _map.Data[y, x];
+          var value = Map.Data[y, x];
 
           // _entities.Add(new Tile(x, y, tileTexture, this));
         }
       }
 
-      Pathfinder = new Pathfinder(_map);
+      Pathfinder = new Pathfinder(Map);
 
-      _gwm = new GameWorldManager(_map);
+      _gwm = new GameWorldManager(this);
       _gwm.Load("save.json");
+
+      _grm = new GatherableResourcesManager(_gwm);
 
       var villagerTexture = _content.Load<Texture2D>($"Villager");
 
       foreach (var villager in _gwm.GameWorld.Villagers)
       {
         var villagerEntity = new Villager(villager, villagerTexture, this, _gwm) { Layer = 0.09f, PositionOffset = new Vector2(0, -Game1.TileSize) };
-        _entities.Add(villagerEntity);
+        AddEntity(villagerEntity);
       }
 
       foreach (var place in _gwm.GameWorld.Places)
@@ -93,32 +96,32 @@ namespace Others.States
 
           }
           var placeEntity = new Place(place, texture, this) { Layer = 0.09f, PositionOffset = new Vector2(xOffset, yOffset), };
-          _entities.Add(placeEntity);
+          AddEntity(placeEntity);
         }
         catch (Exception e)
         {
-
+          // If we don't have a resource (probably)
         }
       }
 
 
-      _map.WriteMap();
-      foreach (var entity in _entities)
-      {
-        entity.LoadContent();
-
-        var mappedComponent = entity.GetComponent<MappedComponent>();
-        if (mappedComponent != null)
-          _map.Add(mappedComponent);
-      }
-      _map.WriteMap();
-
-      PathManager = new PathManager(_map);
+      PathManager = new PathManager(Map);
       PathManager.LoadContent(_content);
 
       #region GUI Stuff
       Panel = new GUI.Panel(_content);
       #endregion
+    }
+
+    private void AddEntity(Entity entity)
+    {
+      entity.LoadContent();
+
+      var mappedComponent = entity.GetComponent<MappedComponent>();
+      if (mappedComponent != null)
+        Map.Add(mappedComponent);
+
+      _entities.Add(entity);
     }
 
     public override void UnloadContent()
@@ -139,6 +142,7 @@ namespace Others.States
         _gwm.Save("save.json");
 
       _gwm.Update();
+      _grm.Update(gameTime);
 
       //PathManager.Update(gameTime);
 
@@ -161,7 +165,7 @@ namespace Others.States
         {
           var mappedComponent = entity.GetComponent<MappedComponent>();
           if (mappedComponent != null)
-            _map.Remove(mappedComponent);
+            Map.Remove(mappedComponent);
 
           _entities.RemoveAt(i);
           i--;

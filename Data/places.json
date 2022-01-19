@@ -14,7 +14,11 @@
       "name": "rocks",
       "type": "Gathering",
       "description": "Just some rocks on the floor",
-      "collisionType": "None"
+      "collisionType": "None",
+      "additionalProperties": {
+        "spawnRate": 0.1,
+        "max": 100
+      }
     },
     {
       "name": "smelter",

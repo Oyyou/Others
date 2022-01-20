@@ -56,8 +56,7 @@ namespace Others.Managers
         var count = (int)Math.Floor(resource.Value.SpawnAmount);
         if (count >= 1)
         {
-          // Commented out until I can figure out how to add to '_entities' too
-          //_gwm.AddGatherablePlace(resource.Key, count);
+          _gwm.AddGatherablePlace(resource.Key, count);
           resource.Value.SpawnAmount = 0f;
         }
       }

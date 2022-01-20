@@ -27,8 +27,6 @@ namespace Others.States
     private GameWorldManager _gwm;
     private GatherableResourcesManager _grm;
 
-    private SpriteFont _font;
-
     public bool ShowGrid { get; private set; } = false;
 
     public bool ShowCollisionBox { get; private set; } = false;
@@ -52,22 +50,7 @@ namespace Others.States
 
     public override void LoadContent()
     {
-      _font = _content.Load<SpriteFont>("Font");
-      //var mapData = File.ReadAllLines("Maps/Map_001.txt").Select(c => c.ToArray()).ToList();
-
-      Map = new Map(40, 40, '0');
-
-      var tileTexture = _content.Load<Texture2D>("Tiles/Floor");
-      var crateTexture = _content.Load<Texture2D>("Cover/Crate");
-      for (int y = 0; y < Map.Height; y++)
-      {
-        for (int x = 0; x < Map.Width; x++)
-        {
-          var value = Map.Data[y, x];
-
-          // _entities.Add(new Tile(x, y, tileTexture, this));
-        }
-      }
+      Map = new Map(1280 / 40, 800 / 40, '0');
 
       Pathfinder = new Pathfinder(Map);
 
@@ -75,35 +58,6 @@ namespace Others.States
       _gwm.Load("save.json");
 
       _grm = new GatherableResourcesManager(_gwm);
-
-      var villagerTexture = _content.Load<Texture2D>($"Villager");
-
-      foreach (var villager in _gwm.GameWorld.Villagers)
-      {
-        var villagerEntity = new Villager(villager, villagerTexture, this, _gwm) { Layer = 0.09f, PositionOffset = new Vector2(0, -Game1.TileSize) };
-        AddEntity(villagerEntity);
-      }
-
-      foreach (var place in _gwm.GameWorld.Places)
-      {
-        try
-        {
-          var texture = _content.Load<Texture2D>($"Places/{place.Name}");
-          var xOffset = place.Data.XOriginPercentage != 0 ? (place.Data.XOriginPercentage / 100f) * texture.Width : 0;
-          var yOffset = place.Data.YOriginPercentage != 0 ? (place.Data.YOriginPercentage / 100f) * texture.Height : 0;
-          if (xOffset != 0)
-          {
-
-          }
-          var placeEntity = new Place(place, texture, this) { Layer = 0.09f, PositionOffset = new Vector2(xOffset, yOffset), };
-          AddEntity(placeEntity);
-        }
-        catch (Exception e)
-        {
-          // If we don't have a resource (probably)
-        }
-      }
-
 
       PathManager = new PathManager(Map);
       PathManager.LoadContent(_content);
@@ -122,6 +76,27 @@ namespace Others.States
         Map.Add(mappedComponent);
 
       _entities.Add(entity);
+    }
+
+    public Entity AddPlaceEntity(Models.PlaceWrapper place)
+    {
+      var texture = _content.Load<Texture2D>($"Places/{place.Name}");
+      var xOffset = place.Data.XOriginPercentage != 0 ? (place.Data.XOriginPercentage / 100f) * texture.Width : 0;
+      var yOffset = place.Data.YOriginPercentage != 0 ? (place.Data.YOriginPercentage / 100f) * texture.Height : 0;
+      var placeEntity = new Place(place, texture, this) { Layer = 0.09f, PositionOffset = new Vector2(xOffset, yOffset), };
+
+      AddEntity(placeEntity);
+
+      return placeEntity;
+    }
+
+    public Entity AddVillagerEntity(Models.Villager villager)
+    {
+      var villagerTexture = _content.Load<Texture2D>($"Villager");
+      var villagerEntity = new Villager(villager, villagerTexture, this, _gwm) { Layer = 0.09f, PositionOffset = new Vector2(0, -Game1.TileSize) };
+      AddEntity(villagerEntity);
+
+      return villagerEntity;
     }
 
     public override void UnloadContent()

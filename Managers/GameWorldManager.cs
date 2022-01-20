@@ -128,6 +128,8 @@ namespace Others.Managers
       place.LoadFromData((Place)GameWorld.PlaceData[placeName].Clone());
       GameWorld.Places.Add(place);
 
+      _state.AddPlaceEntity(place);
+
       return place;
     }
 
@@ -183,7 +185,7 @@ namespace Others.Managers
 
     public void AddVillager(string name, Point mapPoint, Dictionary<string, float> skills = null)
     {
-      GameWorld.Villagers.Add(new Villager(name)
+      var villager = new Villager(name)
       {
         Id = GetId("villager"),
         MapPoint = mapPoint,
@@ -194,7 +196,10 @@ namespace Others.Managers
           wrapper.LoadFromData(GameWorld.AttributeData[v.Key]);
           return wrapper;
         }),
-      });
+      };
+
+      GameWorld.Villagers.Add(villager);
+      _state.AddVillagerEntity(villager);
     }
 
     public void Update()
@@ -314,11 +319,13 @@ namespace Others.Managers
         foreach (var place in GameWorld.Places)
         {
           place.LoadFromSave((Place)GameWorld.PlaceData[place.Name].Clone());
+          _state.AddPlaceEntity(place);
         }
 
-        foreach (var Villager in GameWorld.Villagers)
+        foreach (var villager in GameWorld.Villagers)
         {
-          Villager.Load(GameWorld);
+          villager.Load(GameWorld);
+          _state.AddVillagerEntity(villager);
         }
       }
       else

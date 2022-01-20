@@ -11,7 +11,7 @@ namespace Others.Models
   public class TaskWrapper : IWrapper<Task>
   {
     [JsonProperty("placeId")]
-    public int PlaceId { get; set; }
+    public long PlaceId { get; set; }
 
     [JsonProperty("name")]
     public string Name;

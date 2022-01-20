@@ -3,6 +3,10 @@
     {
       "name": "carryWeight",
       "value": "1"
+    },
+    {
+      "name": "gatherableResourcesTimer",
+      "value": "60.0"
     }
   ]
 }

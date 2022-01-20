@@ -1,40 +1,43 @@
 ﻿using Microsoft.Xna.Framework;
+using Others.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using static Others.Models.GatherableResources;
 
 namespace Others.Managers
 {
   public class GatherableResourcesManager
   {
-    private class ResourceInfo
-    {
-      public int Count;
-
-      public float SpawnAmount;
-    }
-
     private GameWorldManager _gwm;
 
-    private float _timer = 0f;
+    private float _timerLimit = 0f;
 
-    private Dictionary<string, ResourceInfo> _gatherableResources = new Dictionary<string, ResourceInfo>();
+    public GatherableResources GatherableResources
+    {
+      get
+      {
+        return _gwm.GameWorld.GatherableResources;
+      }
+    }
 
     public GatherableResourcesManager(GameWorldManager gwm)
     {
       _gwm = gwm;
       UpdateValues();
+
+      _timerLimit = float.Parse(GameWorldManager.Statics["gatherableResourcesTimer"]);
     }
 
     public void Update(GameTime gameTime)
     {
-      _timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+      GatherableResources.Timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
       
       // We check what resources we have every minute
-      if (_timer > 60f)
+      if (GatherableResources.Timer > _timerLimit)
       {
-        _timer = 0f;
+        GatherableResources.Timer = 0f;
         UpdateValues();
       }
     }
@@ -43,12 +46,12 @@ namespace Others.Managers
     {
       var gatherableResourcesData = _gwm.GameWorld.PlaceData.Where(c => c.Value.Type == "Gathering").ToDictionary(c => c.Key, v => v.Value);
 
-      _gatherableResources = _gwm.GameWorld.Places
+      GatherableResources.Values = _gwm.GameWorld.Places
         .Where(c => c.Data.Type == "Gathering")
         .GroupBy(c => c.Name)
-        .ToDictionary(c => c.Key, v => new ResourceInfo() { Count = v.Count(), SpawnAmount = _gatherableResources.ContainsKey(v.Key) ? (float)(_gatherableResources[v.Key].SpawnAmount + (double)gatherableResourcesData[v.Key].AdditionalProperties["spawnRate"]) : 0f, });
+        .ToDictionary(c => c.Key, v => new ResourceInfo() { Count = v.Count(), SpawnAmount = GatherableResources.Values.ContainsKey(v.Key) ? (float)(GatherableResources.Values[v.Key].SpawnAmount + (double)gatherableResourcesData[v.Key].AdditionalProperties["spawnRate"]) : 0f, });
 
-      foreach (var resource in _gatherableResources)
+      foreach (var resource in GatherableResources.Values)
       {
         if (resource.Value.Count >= (long)gatherableResourcesData[resource.Key].AdditionalProperties["max"])
           continue;

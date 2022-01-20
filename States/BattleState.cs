@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Others.Entities;
 using Others.GUI.VillagerDetails;
@@ -25,7 +26,6 @@ namespace Others.States
     private List<Entity> _entities = new List<Entity>();
 
     private GameWorldManager _gwm;
-    private GatherableResourcesManager _grm;
 
     public bool ShowGrid { get; private set; } = false;
 
@@ -57,8 +57,6 @@ namespace Others.States
       _gwm = new GameWorldManager(this);
       _gwm.Load("save.json");
 
-      _grm = new GatherableResourcesManager(_gwm);
-
       PathManager = new PathManager(Map);
       PathManager.LoadContent(_content);
 
@@ -80,14 +78,27 @@ namespace Others.States
 
     public Entity AddPlaceEntity(Models.PlaceWrapper place)
     {
-      var texture = _content.Load<Texture2D>($"Places/{place.Name}");
-      var xOffset = place.Data.XOriginPercentage != 0 ? (place.Data.XOriginPercentage / 100f) * texture.Width : 0;
-      var yOffset = place.Data.YOriginPercentage != 0 ? (place.Data.YOriginPercentage / 100f) * texture.Height : 0;
-      var placeEntity = new Place(place, texture, this) { Layer = 0.09f, PositionOffset = new Vector2(xOffset, yOffset), };
+      try
+      {
+        var texture = _content.Load<Texture2D>($"Places/{place.Name}");
+        var xOffset = place.Data.XOriginPercentage != 0 ? (place.Data.XOriginPercentage / 100f) * texture.Width : 0;
+        var yOffset = place.Data.YOriginPercentage != 0 ? (place.Data.YOriginPercentage / 100f) * texture.Height : 0;
+        var placeEntity = new Place(place, texture, this) { Layer = 0.09f, PositionOffset = new Vector2(xOffset, yOffset), };
 
-      AddEntity(placeEntity);
+        AddEntity(placeEntity);
 
-      return placeEntity;
+        return placeEntity;
+      }
+      catch (ContentLoadException e)
+      {
+        // Place doesn't exist. lol
+      }
+      catch (Exception e)
+      {
+
+      }
+
+      return null;
     }
 
     public Entity AddVillagerEntity(Models.Villager villager)
@@ -116,8 +127,7 @@ namespace Others.States
       if (GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.S))
         _gwm.Save("save.json");
 
-      _gwm.Update();
-      _grm.Update(gameTime);
+      _gwm.Update(gameTime);
 
       //PathManager.Update(gameTime);
 

@@ -7,7 +7,7 @@ namespace Others.Models
   public class PlaceWrapper : IWrapper<Place>
   {
     [JsonProperty("id")]
-    public int Id { get; set; }
+    public long Id { get; set; }
 
     [JsonProperty("name")]
     public string Name { get; private set; }

@@ -16,6 +16,8 @@ namespace Others.Managers
   {
     private BattleState _state;
 
+    private GatherableResourcesManager _grm;
+
     public static Random Random = new Random();
 
     public static Dictionary<string, string> Statics = new Dictionary<string, string>();
@@ -23,8 +25,6 @@ namespace Others.Managers
     public GameWorld GameWorld { get; set; }
 
     public readonly Pathfinder Pathfinder;
-
-    public List<int> RemovedPlaces { get; private set; } = new List<int>();
 
     public GameWorldManager(BattleState state)
     {
@@ -40,7 +40,7 @@ namespace Others.Managers
       return ++GameWorld.Ids[dataType];
     }
 
-    public void AddTask(string taskName, int priority, int placeId)
+    public void AddTask(string taskName, int priority, long placeId)
     {
       if (!GameWorld.TaskData.ContainsKey(taskName))
       {
@@ -171,7 +171,7 @@ namespace Others.Managers
       item.Id = GetId("item");
     }*/
 
-    public void DeletePlaceById(int id)
+    public void DeletePlaceById(long id)
     {
       for (int i = 0; i < GameWorld.Places.Count; i++)
       {
@@ -202,24 +202,24 @@ namespace Others.Managers
       _state.AddVillagerEntity(villager);
     }
 
-    public void Update()
+    public void Update(GameTime gameTime)
     {
       AssignTasks();
 
       UpdateVillager();
 
       UpdatePlaces();
+
+      _grm.Update(gameTime);
     }
 
     private void UpdatePlaces()
     {
-      RemovedPlaces = new List<int>();
       for (int i = 0; i < GameWorld.Places.Count; i++)
       {
         if (GameWorld.Places[i].IsRemoved)
         {
           GameWorld.Places.RemoveAt(i);
-          RemovedPlaces.Add(GameWorld.Places[i].Id);
         }
       }
     }
@@ -335,6 +335,8 @@ namespace Others.Managers
 
         SetDefaultWorld();
       }
+
+      _grm = new GatherableResourcesManager(this);
     }
 
     private void SetDefaultWorld()

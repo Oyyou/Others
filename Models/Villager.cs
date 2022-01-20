@@ -27,7 +27,7 @@ namespace Others.Models
     private float _taskTimer;
 
     [JsonProperty("id")]
-    public int Id;
+    public long Id;
 
     [JsonProperty("name")]
     public string Name { get; set; }
@@ -57,7 +57,7 @@ namespace Others.Models
     public TaskWrapper CurrentTask { get; set; }
 
     [JsonProperty("currentPlaceId")]
-    public int CurrentPlaceId { get; set; }
+    public long CurrentPlaceId { get; set; }
 
     public enum VillagerStates
     {
@@ -236,7 +236,7 @@ namespace Others.Models
       var taskData = gwm.GameWorld.TaskData["idle"];
 
       var task = new TaskWrapper();
-      var idleLocation = gwm.AddPlace("idleSpot", 0, 0); // TODO: Set x/y to current position
+      var idleLocation = gwm.AddPlace("idleSpot", MapPoint); // TODO: Set x/y to current position
       task.PlaceId = idleLocation.Id;
       task.LoadFromData(taskData);
 

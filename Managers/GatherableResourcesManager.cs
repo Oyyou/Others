@@ -25,9 +25,10 @@ namespace Others.Managers
     public GatherableResourcesManager(GameWorldManager gwm)
     {
       _gwm = gwm;
+      _timerLimit = float.Parse(GameWorldManager.Statics["gatherableResourcesTimer"]);
+
       UpdateValues();
 
-      _timerLimit = float.Parse(GameWorldManager.Statics["gatherableResourcesTimer"]);
     }
 
     public void Update(GameTime gameTime)

@@ -3,12 +3,15 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Others.States;
 using ZonerEngine.GL;
+using ZonerEngine.GL.Input;
 
 namespace Others
 {
   public class Game1 : ZonerGame
   {
     public const int TileSize = 40;
+
+    public int GameSpeed { get; private set; } = 1;
 
     public Game1()
     {
@@ -30,8 +33,18 @@ namespace Others
 
     protected override void Update(GameTime gameTime)
     {
-      //for(int i =0; i < 5; i++)
-      _state.Update(gameTime);
+      if (GameKeyboard.IsKeyPressed(Keys.D1))
+        GameSpeed = 1;
+      if (GameKeyboard.IsKeyPressed(Keys.D2))
+        GameSpeed = 2;
+      if (GameKeyboard.IsKeyPressed(Keys.D3))
+        GameSpeed = 3;
+
+
+      for (int i = 0; i < GameSpeed; i++)
+      {
+        _state.Update(gameTime);
+      }
 
       base.Update(gameTime);
     }

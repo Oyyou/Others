@@ -1,0 +1,25 @@
+﻿{
+  "type": "crafting",
+  "skillRequirements": [
+    {
+      "name": "?",
+      "level": 0
+    }
+  ],
+  "requiredResources": [
+    {
+      "name": "stick",
+      "amount": 2
+    },
+    {
+      "name": "rock",
+      "amount": 1
+    }
+  ],
+  "producedItems": [
+    {
+      "name": "woddenAxe",
+      "amount": 1
+    }
+  ]
+}

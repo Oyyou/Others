@@ -1,0 +1,16 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "35a8830a-5cd2-40ec-9df4-0d54fd8e00d9": {
+      "ProjectGuid": "35a8830a-5cd2-40ec-9df4-0d54fd8e00d9",
+      "DisplayName": "Others",
+      "ColorIndex": 0
+    },
+    "dade6378-36ea-4788-a418-38ace1448fdd": {
+      "ProjectGuid": "dade6378-36ea-4788-a418-38ace1448fdd",
+      "DisplayName": "ZonerEngine.GL",
+      "ColorIndex": 1
+    }
+  },
+  "NextColorIndex": 2
+}

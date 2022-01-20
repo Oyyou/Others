@@ -41,6 +41,7 @@ namespace Others.States
 
     #region GUI Stuff
     public GUI.Panel Panel;
+    public GUI.CraftingDetails.Panel craftingPanel;
     #endregion
 
     public BattleState(GameModel gameModel)
@@ -62,6 +63,7 @@ namespace Others.States
 
       #region GUI Stuff
       Panel = new GUI.Panel(_content);
+      craftingPanel = new GUI.CraftingDetails.Panel(_content);
       #endregion
     }
 

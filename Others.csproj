@@ -23,7 +23,7 @@
     <MonoGameContentReference Include="Content\Content.mgcb" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ZonerEngine.GL\ZonerEngine.GL\ZonerEngine.GL.csproj" />
+    <ProjectReference Include="..\ZonerEngine.GL\ZonerEngine.GL\ZonerEngine.GL.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Data\Attributes\energy-attr.json">

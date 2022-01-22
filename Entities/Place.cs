@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Others.States;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using ZonerEngine.GL;
 using ZonerEngine.GL.Components;
@@ -82,6 +83,21 @@ namespace Others.Entities
         OffSelected = () =>
         {
           IsSelected = false;
+        },
+        GetInformation = () =>
+        {
+          return new ZonerEngine.GL.Models.EntityInformation()
+          {
+            Header = Wrapper.Name,
+            Sections = new List<ZonerEngine.GL.Models.EntityInformation.Content>()
+            {
+              new ZonerEngine.GL.Models.EntityInformation.Content()
+              {
+                Header = "Information",
+                Values = Wrapper.AdditionalProperties.Select(c => $"{c.Key}: {c.Value}").ToArray(),
+              },
+            }
+          };
         }
       });
     }

@@ -165,9 +165,14 @@ namespace Others.States
             if (selectedComponent.IsSelected)
             {
               Panel.Clear();
-              Panel.SetMainHeader("Test header");
-              Panel.AddSection("Test subheader 1", "Test value: 1", "Test value: 1");
-              Panel.AddSection("Test subheader 2", "Test value: 2", "Test value: 2");
+              if (selectedComponent.Information != null)
+              {
+                Panel.SetMainHeader(selectedComponent.Information.Header);
+                foreach (var info in selectedComponent.Information.Sections)
+                {
+                  Panel.AddSection(info.Header, info.Values);
+                }
+              }
             }
           }
         }

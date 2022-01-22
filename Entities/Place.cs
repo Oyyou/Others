@@ -93,6 +93,11 @@ namespace Others.Entities
             {
               new ZonerEngine.GL.Models.EntityInformation.Content()
               {
+                Header = "Description",
+                Values = new string[] { Wrapper.Data.Description },
+              },
+              new ZonerEngine.GL.Models.EntityInformation.Content()
+              {
                 Header = "Information",
                 Values = Wrapper.AdditionalProperties.Select(c => $"{c.Key}: {c.Value}").ToArray(),
               },

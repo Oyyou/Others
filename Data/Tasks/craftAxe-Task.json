@@ -8,7 +8,7 @@
   ],
   "requiredResources": [
     {
-      "name": "stick",
+      "name": "sticks",
       "amount": 2
     },
     {

@@ -21,6 +21,16 @@
       }
     },
     {
+      "name": "sticks",
+      "type": "Gathering",
+      "description": "Cheeky pile of sticks on the floor",
+      "collisionType": "None",
+      "additionalProperties": {
+        "spawnRate": 0.1,
+        "max": 100
+      }
+    },
+    {
       "name": "smelter",
       "skill": "smithing",
       "type": "Production",

@@ -358,6 +358,8 @@ namespace Others.Managers
 
       AddPlace("rocks", 1, 2);
 
+      AddPlace("sticks", 1, 3);
+
       AddPlace("normalTree", 3, 1);
 
       foreach (var place in GameWorld.Places.Where(c => c.Data.Skill == "mining"))

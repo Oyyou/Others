@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Others.Controls;
 using Others.Entities;
 using Others.GUI.VillagerDetails;
 using Others.Managers;
@@ -42,6 +43,8 @@ namespace Others.States
     #region GUI Stuff
     public GUI.Panel Panel;
     public GUI.CraftingDetails.Panel CraftingPanel;
+
+    private List<Control> _controls;
     #endregion
 
     public BattleState(GameModel gameModel)
@@ -64,6 +67,14 @@ namespace Others.States
       #region GUI Stuff
       Panel = new GUI.Panel(_content);
       CraftingPanel = new GUI.CraftingDetails.Panel(_content);
+
+      _controls = new List<Control>()
+      {
+        new Button(_content.Load<Texture2D>("GUI/Button"), _content.Load<SpriteFont>("Font"), "TODO")
+        {
+          Position = new Vector2(600, 50),
+        },
+      };
       #endregion
     }
 
@@ -131,6 +142,9 @@ namespace Others.States
 
       _gwm.Update(gameTime);
 
+      foreach (var control in _controls)
+        control.Update(gameTime);
+
       //PathManager.Update(gameTime);
 
       foreach (var entity in _entities)
@@ -193,6 +207,9 @@ namespace Others.States
       _spriteBatch.End();
 
       _spriteBatch.Begin();
+
+      foreach (var control in _controls)
+        control.Draw(gameTime, _spriteBatch);
 
       Panel.Draw(_spriteBatch, gameTime);
 

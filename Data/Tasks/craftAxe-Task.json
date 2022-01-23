@@ -1,8 +1,8 @@
 ﻿{
-  "type": "crafting",
+  "type": "Crafting",
   "skillRequirements": [
     {
-      "name": "Gathering",
+      "name": "crafting",
       "level": 1
     }
   ],

@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Others.Controls;
 using Others.Entities;
-using Others.GUI.VillagerDetails;
 using Others.Managers;
 using System;
 using System.Collections.Generic;
@@ -70,12 +69,31 @@ namespace Others.States
 
       _controls = new List<Control>()
       {
-        new Button(_content.Load<Texture2D>("GUI/Button"), _content.Load<SpriteFont>("Font"), "TODO")
-        {
-          Position = new Vector2(600, 50),
-        },
+        GetCraftingPanel(),
       };
       #endregion
+    }
+
+    private Control GetCraftingPanel()
+    {
+      var panelTexture = _content.Load<Texture2D>("GUI/Panel");
+      var font = _content.Load<SpriteFont>("Font");
+      var buttonTexture = _content.Load<Texture2D>("GUI/Button");
+
+      var panel = new Panel(panelTexture, new Vector2(0, ZonerGame.ScreenHeight - panelTexture.Height));
+      panel.AddChild(new Label(font, "Crafting") { Position = new Vector2(10, 20) });
+      panel.AddChild(new Button(buttonTexture, font, "Craft Hatchet") { Position = new Vector2(10, 40) });
+      panel.AddChild(new Button(buttonTexture, font, "Craft Pickaxe") { Position = new Vector2(10, 90) });
+
+      panel.GetVisibility = () =>
+      {
+        if (GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.C))
+          panel.IsVisible = !panel.IsVisible;
+
+        return panel.IsVisible;
+      };
+
+      return panel;
     }
 
     private void AddEntity(Entity entity)
@@ -134,8 +152,8 @@ namespace Others.States
       if (GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.G))
         ShowGrid = !ShowGrid;
 
-      if (GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.C))
-        ShowCollisionBox = !ShowCollisionBox;
+      //if (GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.C))
+      //  ShowCollisionBox = !ShowCollisionBox;
 
       if (GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.S))
         _gwm.Save("save.json");
@@ -143,7 +161,12 @@ namespace Others.States
       _gwm.Update(gameTime);
 
       foreach (var control in _controls)
+      {
+        if (!control.IsDrawingVisible)
+          continue;
+
         control.Update(gameTime);
+      }
 
       //PathManager.Update(gameTime);
 
@@ -206,10 +229,15 @@ namespace Others.States
 
       _spriteBatch.End();
 
-      _spriteBatch.Begin();
+      _spriteBatch.Begin(SpriteSortMode.FrontToBack);
 
       foreach (var control in _controls)
+      {
+        if (!control.IsDrawingVisible)
+          continue;
+
         control.Draw(gameTime, _spriteBatch);
+      }
 
       Panel.Draw(_spriteBatch, gameTime);
 

@@ -12,6 +12,8 @@ namespace Others.Controls
 
     public string Text { get; set; }
 
+    public override Rectangle Rectangle => new Rectangle((int)DrawPosition.X, (int)DrawPosition.Y, (int)_font.MeasureString(Text).X, (int)_font.MeasureString(Text).Y);
+
     public Label(SpriteFont font, string text) : base()
     {
       _font = font;
@@ -20,7 +22,7 @@ namespace Others.Controls
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      spriteBatch.DrawString(_font, Text, DrawPosition, Color.Black);
+      spriteBatch.DrawString(_font, Text, DrawPosition, Color.Black, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, DrawLayer);
 
       DrawChildren(gameTime, spriteBatch);
     }

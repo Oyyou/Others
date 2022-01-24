@@ -15,21 +15,47 @@ namespace Others.Controls
 
     public Vector2 Position { get; set; }
 
+    public float Layer { get; set; }
+
+    public bool IsVisible { get; set; } = false;
+
+    public bool IsDrawingVisible
+    {
+      get
+      {
+        return GetVisibility != null ? GetVisibility() : IsVisible;
+      }
+    }
+
     public Vector2 DrawPosition
     {
       get
       {
-        return Parent != null ? Parent.Position + Position : Position;
+        return Parent != null ? Parent.DrawPosition + Position : Position;
       }
     }
 
-    public Rectangle Rectangle => new Rectangle((int)DrawPosition.X, (int)DrawPosition.Y, 10, 10);// _texture.Width, _texture.Height); // TODO: Fix
+    public float DrawLayer
+    {
+      get
+      {
+        return Parent != null ? Parent.DrawLayer + 0.01f : Layer;
+      }
+    }
+
+    public abstract Rectangle Rectangle { get; }// => new Rectangle((int)DrawPosition.X, (int)DrawPosition.Y, 10, 10);// _texture.Width, _texture.Height); // TODO: Fix
 
     public bool IsMouseOver { get; protected set; } = false;
 
     public bool IsMouseDown { get; protected set; } = false;
 
     public bool IsMouseClicked { get; protected set; } = false;
+
+    public Action OnHover { get; set; } = null;
+
+    public Action OnClicked { get; set; } = null;
+
+    public Func<bool> GetVisibility = null;
 
     public Control()
     {
@@ -61,15 +87,17 @@ namespace Others.Controls
       if (GameMouse.Intersects(Rectangle))
       {
         IsMouseOver = true;
+        OnHover?.Invoke();
 
         if (GameMouse.IsLeftPressed)
         {
           IsMouseDown = true;
         }
 
-        if (GameMouse.IsLeftPressed)
+        if (GameMouse.IsLeftClicked)
         {
           IsMouseClicked = true;
+          OnClicked?.Invoke();
         }
       }
 

@@ -203,8 +203,8 @@ namespace Others.Models
 
             Inventory[item.Name].Count++;
 
-            var health = (long)place.AdditionalProperties["health"] - 1;
-            place.AdditionalProperties["health"] = health;
+            var health = (long)place.AdditionalProperties["health"].Value - 1;
+            place.AdditionalProperties["health"].Value = health;
 
             Console.WriteLine($"{Name} recieved {item.Name}");
 
@@ -258,10 +258,10 @@ namespace Others.Models
 
       if (!place.AdditionalProperties.ContainsKey("inventory"))
       {
-        place.AdditionalProperties.Add("inventory", new Dictionary<string, int>());
+        place.AdditionalProperties.Add("inventory", new AdditionalProperty() { Value = new Dictionary<string, int>() });
       }
 
-      var placeInventory = place.AdditionalProperties["inventory"].ToDictionary<string, int>();
+      var placeInventory = place.AdditionalProperties["inventory"].Value;
 
       foreach (var item in Inventory)
       {
@@ -273,7 +273,7 @@ namespace Others.Models
 
       Inventory = new Dictionary<string, ItemWrapper>();
 
-      place.AdditionalProperties["inventory"] = placeInventory;
+      place.AdditionalProperties["inventory"].Value = placeInventory;
       CurrentTask = null;
     }
 
@@ -412,12 +412,12 @@ namespace Others.Models
       PlaceWrapper bed = null;
 
       var beds = gwm.GameWorld.Places.Where(c => c.Data.Type == taskType);
-      var villagersBed = beds.FirstOrDefault(c => (long)c.AdditionalProperties["ownerId"] == this.Id);
+      var villagersBed = beds.FirstOrDefault(c => (long)c.AdditionalProperties["ownerId"].Value == this.Id);
 
       // If the villager doesn't have a bed =(
       if (villagersBed == null)
       {
-        var availableBeds = beds.Where(c => (long)c.AdditionalProperties["ownerId"] == -1);
+        var availableBeds = beds.Where(c => (long)c.AdditionalProperties["ownerId"].Value == -1);
 
         // If there are no available beds anywhere =(((((
         if (availableBeds.Count() == 0)
@@ -428,7 +428,7 @@ namespace Others.Models
         {
           // Get the bed closest
           bed = availableBeds.OrderBy(c => Vector2.Distance(c.Point.ToVector2(), this.MapPoint.ToVector2())).FirstOrDefault();
-          bed.AdditionalProperties["ownerId"] = this.Id;
+          bed.AdditionalProperties["ownerId"].Value = this.Id;
         }
       }
       else

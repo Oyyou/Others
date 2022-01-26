@@ -16,7 +16,7 @@ namespace Others.Models
     public Point Point { get; set; }
 
     [JsonProperty("additionalProperties")]
-    public Dictionary<string, object> AdditionalProperties { get; set; } = null;
+    public Dictionary<string, AdditionalProperty> AdditionalProperties { get; set; } = null;
 
     [JsonIgnore]
     public bool IsRemoved { get; set; } = false;

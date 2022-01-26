@@ -48,12 +48,12 @@ namespace Others.Models
     public int YOriginPercentage { get; set; }
 
     [JsonProperty("additionalProperties")]
-    public Dictionary<string, object> AdditionalProperties { get; set; } = new Dictionary<string, object>();
+    public Dictionary<string, AdditionalProperty> AdditionalProperties { get; set; } = new Dictionary<string, AdditionalProperty>();
 
     public object Clone()
     {
       var newObj = (Place)this.MemberwiseClone();
-      newObj.AdditionalProperties = this.AdditionalProperties.ToDictionary(c => c.Key, v => v.Value);
+      newObj.AdditionalProperties = this.AdditionalProperties.ToDictionary(c => c.Key, v => (AdditionalProperty)v.Value.Clone());
 
       return newObj;
     }

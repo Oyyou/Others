@@ -7,7 +7,10 @@
       "description": "A node for mining gold ore",
       "collisionType": "Full",
       "additionalProperties": {
-        "health": 10
+        "health": {
+          "value": 10,
+          "isVisible": false
+        }
       }
     },
     {
@@ -16,8 +19,14 @@
       "description": "Just some rocks on the floor",
       "collisionType": "None",
       "additionalProperties": {
-        "spawnRate": 0.1,
-        "max": 100
+        "spawnRate": {
+          "value": 0.1,
+          "isVisible": false
+        },
+        "max": {
+          "value": 100,
+          "isVisible": false
+        }
       }
     },
     {
@@ -26,8 +35,14 @@
       "description": "Cheeky pile of sticks on the floor",
       "collisionType": "None",
       "additionalProperties": {
-        "spawnRate": 0.1,
-        "max": 100
+        "spawnRate": {
+          "value": 0.1,
+          "isVisible": false
+        },
+        "max": {
+          "value": 100,
+          "isVisible": false
+        }
       }
     },
     {
@@ -37,7 +52,10 @@
       "description": "",
       "collisionType": "Full",
       "additionalProperties": {
-        "health": 100
+        "health": {
+          "value": 100,
+          "isVisible": true
+        }
       }
     },
     {
@@ -47,7 +65,10 @@
       "description": "",
       "collisionType": "Full",
       "additionalProperties": {
-        "capacity": 50
+        "capacity": {
+          "value": 50,
+          "isVisible": true
+        }
       }
     },
     {
@@ -61,7 +82,10 @@
       "xOriginPercentage": -25,
       "yOriginPercentage": -5,
       "additionalProperties": {
-        "health": 50
+        "health": {
+          "value": 50,
+          "isVisible": true
+        }
       }
     },
     {
@@ -73,8 +97,14 @@
       "xOriginPercentage": 0,
       "yOriginPercentage": -33,
       "additionalProperties": {
-        "capacity": 1,
-        "ownerId": -1
+        "capacity": {
+          "value": 1,
+          "isVisible": false
+        },
+        "ownerId": {
+          "value": -1,
+          "isVisible": false
+        }
       },
       "mainResource": 6,
       "requiredResources": [

@@ -273,6 +273,10 @@ namespace Others.Managers
       }
     }
 
+    /// <summary>
+    /// Might not work
+    /// </summary>
+    /// <returns>Error (maybe?)</returns>
     public Dictionary<string, int> GetInventory()
     {
       var value = GameWorld.Places

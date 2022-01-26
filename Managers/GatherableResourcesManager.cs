@@ -50,11 +50,11 @@ namespace Others.Managers
       GatherableResources.Values = _gwm.GameWorld.Places
         .Where(c => c.Data.Type == "Gathering")
         .GroupBy(c => c.Name)
-        .ToDictionary(c => c.Key, v => new ResourceInfo() { Count = v.Count(), SpawnAmount = GatherableResources.Values.ContainsKey(v.Key) ? (float)(GatherableResources.Values[v.Key].SpawnAmount + (double)gatherableResourcesData[v.Key].AdditionalProperties["spawnRate"]) : 0f, });
+        .ToDictionary(c => c.Key, v => new ResourceInfo() { Count = v.Count(), SpawnAmount = GatherableResources.Values.ContainsKey(v.Key) ? (float)(GatherableResources.Values[v.Key].SpawnAmount + (double)gatherableResourcesData[v.Key].AdditionalProperties["spawnRate"].Value) : 0f, });
 
       foreach (var resource in GatherableResources.Values)
       {
-        if (resource.Value.Count >= (long)gatherableResourcesData[resource.Key].AdditionalProperties["max"])
+        if (resource.Value.Count >= (long)gatherableResourcesData[resource.Key].AdditionalProperties["max"].Value)
           continue;
 
         var count = (int)Math.Floor(resource.Value.SpawnAmount);

@@ -19,13 +19,7 @@ namespace Others.Controls
 
     public bool IsVisible { get; set; } = false;
 
-    public bool IsDrawingVisible
-    {
-      get
-      {
-        return GetVisibility != null ? GetVisibility() : IsVisible;
-      }
-    }
+    public bool IsDrawingVisible { get; private set; }
 
     public Vector2 DrawPosition
     {

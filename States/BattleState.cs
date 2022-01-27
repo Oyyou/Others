@@ -162,7 +162,11 @@ namespace Others.States
 
       foreach (var control in _controls)
       {
-        if (!control.IsDrawingVisible)
+        // TODO: Sort out this mess
+        if (control.GetVisibility != null)
+          control.IsVisible = control.GetVisibility();
+
+        if (!control.IsVisible)
           continue;
 
         control.Update(gameTime);
@@ -233,7 +237,7 @@ namespace Others.States
 
       foreach (var control in _controls)
       {
-        if (!control.IsDrawingVisible)
+        if (!control.IsVisible)
           continue;
 
         control.Draw(gameTime, _spriteBatch);

@@ -10,7 +10,7 @@ namespace Others.Controls
   {
     private Texture2D _texture;
 
-    public override Rectangle Rectangle => new Rectangle((int)Position.X, (int)Position.Y, _texture.Height, _texture.Height);
+    public override Rectangle Rectangle => new Rectangle((int)Position.X, (int)Position.Y, _texture.Width, _texture.Height);
 
     public Panel(Texture2D texture, Vector2 position)
     {

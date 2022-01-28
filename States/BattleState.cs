@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Others.Controls;
 using Others.Entities;
 using Others.Managers;
@@ -21,6 +22,8 @@ namespace Others.States
 {
   public class BattleState : State
   {
+    private Viewport _viewport;
+
     public Map Map { get; private set; }
 
     private List<Entity> _entities = new List<Entity>();
@@ -53,6 +56,8 @@ namespace Others.States
 
     public override void LoadContent()
     {
+      _viewport = GameModel.GraphicsDevice.Viewport;
+
       Map = new Map(1280 / 40, 800 / 40, '0');
 
       Pathfinder = new Pathfinder(Map);
@@ -69,31 +74,110 @@ namespace Others.States
 
       _controls = new List<Control>()
       {
+        GetControlsPanel(),
         GetCraftingPanel(),
+        GetBuildingPanel(),
       };
       #endregion
     }
 
+    /// <summary>
+    /// The panel at the bottom of the screen
+    /// </summary>
+    /// <returns></returns>
+    private Control GetControlsPanel()
+    {
+      var panelTexture = new Texture2D(GameModel.GraphicsDevice, ZonerGame.ScreenWidth, 100);
+      panelTexture.SetData(Helpers.GetBorder(panelTexture.Width, panelTexture.Height, 2, Color.Black, Color.White));
+
+      var panel = new Panel(panelTexture, new Vector2(0, ZonerGame.ScreenHeight - panelTexture.Height));
+      panel.IsVisible = true;
+
+      var buttonTexture = new Texture2D(GameModel.GraphicsDevice, 100, panelTexture.Height - 10);
+      buttonTexture.SetData(Helpers.GetBorder(buttonTexture.Width, buttonTexture.Height, 2, Color.Black, Color.Gray));
+      var font = _content.Load<SpriteFont>("Font");
+
+      panel.AddChild(new Button(buttonTexture, font, "Build") { OnClicked = () => SetMainVisibility((Panel)_controls.FirstOrDefault(c => c.HasTag("Building"))) });
+      panel.AddChild(new Button(buttonTexture, font, "Craft") { OnClicked = () => SetMainVisibility((Panel)_controls.FirstOrDefault(c => c.HasTag("Crafting"))) });
+      panel.AddChild(new Button(buttonTexture, font, "Tasks") { OnClicked = () => SetMainVisibility((Panel)_controls.FirstOrDefault(c => c.HasTag("Tasks"))) });
+
+      var x = 5f;
+      foreach (var control in panel.Children)
+      {
+        control.Position = new Vector2(x, 5);
+        x += buttonTexture.Width + 5;
+      }
+
+      return panel;
+    }
+
     private Control GetCraftingPanel()
     {
-      var panelTexture = _content.Load<Texture2D>("GUI/Panel");
+      var panelTexture = new Texture2D(GameModel.GraphicsDevice, 300, 150);
+      panelTexture.SetData(Helpers.GetBorder(panelTexture.Width, panelTexture.Height, 2, Color.Black, Color.White));
       var font = _content.Load<SpriteFont>("Font");
       var buttonTexture = _content.Load<Texture2D>("GUI/Button");
 
-      var panel = new Panel(panelTexture, new Vector2(0, ZonerGame.ScreenHeight - panelTexture.Height));
+      var panel = new Panel(panelTexture, new Vector2(0, 0));
+      panel.Viewport = new Rectangle(0, (ZonerGame.ScreenHeight - 100) - panelTexture.Height, panelTexture.Width, panelTexture.Height);
       panel.AddChild(new Label(font, "Crafting") { Position = new Vector2(10, 20) });
       panel.AddChild(new Button(buttonTexture, font, "Craft Hatchet") { Position = new Vector2(10, 40) });
       panel.AddChild(new Button(buttonTexture, font, "Craft Pickaxe") { Position = new Vector2(10, 90) });
+      panel.AddChild(new Button(buttonTexture, font, "Craft Pickaxe") { Position = new Vector2(10, 140) });
+      panel.AddChild(new Button(buttonTexture, font, "Craft Pickaxe") { Position = new Vector2(10, 190) });
+      panel.AddChild(new ScrollBar(GameModel.GraphicsDevice, font, panelTexture.Height - 10) { Position = new Vector2(panelTexture.Width - 25, 5), IsFixedPosition = true });
+      panel.AddTag("Main");
+      panel.AddTag("Crafting");
 
-      panel.GetVisibility = () =>
-      {
-        if (GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.C))
-          panel.IsVisible = !panel.IsVisible;
-
-        return panel.IsVisible;
-      };
+      panel.GetVisibility = () => GetVisibility(panel, Keys.C);
 
       return panel;
+    }
+
+    private Control GetBuildingPanel()
+    {
+      var panelTexture = new Texture2D(GameModel.GraphicsDevice, 300, 150);
+      panelTexture.SetData(Helpers.GetBorder(panelTexture.Width, panelTexture.Height, 2, Color.Black, Color.White));
+      var font = _content.Load<SpriteFont>("Font");
+      var buttonTexture = _content.Load<Texture2D>("GUI/Button");
+
+      var panel = new Panel(panelTexture, new Vector2(0, (ZonerGame.ScreenHeight - 100) - panelTexture.Height));
+      panel.AddChild(new Label(font, "Building") { Position = new Vector2(10, 20) });
+      panel.AddChild(new Button(buttonTexture, font, "Build House") { Position = new Vector2(10, 40) });
+      panel.AddTag("Main");
+      panel.AddTag("Building");
+
+      panel.GetVisibility = () => GetVisibility(panel, Keys.B);
+
+      return panel;
+    }
+
+    private bool GetVisibility(Panel panel, Keys key)
+    {
+      if (GameKeyboard.IsKeyPressed(key))
+      {
+        SetMainVisibility(panel);
+      }
+
+      return panel.IsVisible;
+    }
+
+    private void SetMainVisibility(Panel panel)
+    {
+      if (panel == null)
+        return;
+
+      panel.IsVisible = !panel.IsVisible;
+
+      if (panel.IsVisible)
+      {
+        foreach (var p in _controls.Where(c => c.HasTag("Main")))
+        {
+          p.IsVisible = false;
+        }
+
+        panel.IsVisible = true;
+      }
     }
 
     private void AddEntity(Entity entity)
@@ -222,24 +306,35 @@ namespace Others.States
 
     public override void Draw(GameTime gameTime)
     {
+      GameModel.GraphicsDevice.Viewport = _viewport;
       _spriteBatch.Begin(SpriteSortMode.FrontToBack);
-
-      //((TextureComponent)_entities[10].Components[0]).Layer = 0.02f;
 
       foreach (var entity in _entities)
         entity.Draw(gameTime, _spriteBatch);
 
-      //PathManager.Draw(gameTime, _spriteBatch);
-
       _spriteBatch.End();
 
-      _spriteBatch.Begin(SpriteSortMode.FrontToBack);
 
-      foreach (var control in _controls)
+      foreach (var control in _controls.Where(c => c.HasViewport))
       {
         if (!control.IsVisible)
           continue;
 
+        //_spriteBatch.Begin(SpriteSortMode.FrontToBack, transformMatrix: control.ViewMatrix);
+        _spriteBatch.Begin(SpriteSortMode.FrontToBack);
+
+        GameModel.GraphicsDevice.Viewport = new Viewport(control.Viewport);
+        control.Draw(gameTime, _spriteBatch);
+        _spriteBatch.End();
+      }
+
+      _spriteBatch.Begin(SpriteSortMode.FrontToBack);
+      foreach (var control in _controls.Where(c => !c.HasViewport))
+      {
+        if (!control.IsVisible)
+          continue;
+
+        GameModel.GraphicsDevice.Viewport = _viewport;
         control.Draw(gameTime, _spriteBatch);
       }
 

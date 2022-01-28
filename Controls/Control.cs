@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ZonerEngine.GL;
 using ZonerEngine.GL.Input;
 
 namespace Others.Controls
@@ -21,11 +22,15 @@ namespace Others.Controls
 
     public bool IsDrawingVisible { get; private set; }
 
+    public List<string> Tags { get; set; } = new List<string>();
+
+    public bool IsFixedPosition { get; set; } = false;
+
     public Vector2 DrawPosition
     {
       get
       {
-        return Parent != null ? Parent.DrawPosition + Position : Position;
+        return Parent != null ? (Parent.DrawPosition + Position + (!IsFixedPosition ? Parent.ChildrenOffset : Vector2.Zero)) : Position;
       }
     }
 
@@ -37,15 +42,60 @@ namespace Others.Controls
       }
     }
 
+    public Matrix ViewMatrix = Matrix.CreateTranslation(0, 0, 0);
+
+    public Vector2 ChildrenOffset = Vector2.Zero;
+
+    public Rectangle Viewport = new Rectangle(0, 0, ZonerGame.ScreenWidth, ZonerGame.ScreenHeight);
+
+    public Rectangle DrawViewport
+    {
+      get
+      {
+        return Parent != null ? Parent.DrawViewport : Viewport;
+      }
+    }
+
+    public bool HasViewport
+    {
+      get
+      {
+        return DrawViewport.Width > 0 && DrawViewport.Height > 0;
+      }
+    }
+
+    public Vector2 MousePosition
+    {
+      get
+      {
+        if (HasViewport)
+          return GameMouse.Position.ToVector2() - new Vector2(DrawViewport.X, DrawViewport.Y);
+
+        return GameMouse.Position.ToVector2();
+      }
+    }
+
+    public Rectangle MouseRectangle
+    {
+      get
+      {
+        return new Rectangle((int)MousePosition.X, (int)MousePosition.Y, 1, 1);
+      }
+    }
+
     public abstract Rectangle Rectangle { get; }// => new Rectangle((int)DrawPosition.X, (int)DrawPosition.Y, 10, 10);// _texture.Width, _texture.Height); // TODO: Fix
 
     public bool IsMouseOver { get; protected set; } = false;
+
+    public bool IsHeld { get; protected set; } = false;
 
     public bool IsMouseDown { get; protected set; } = false;
 
     public bool IsMouseClicked { get; protected set; } = false;
 
     public Action OnHover { get; set; } = null;
+
+    public Action OnHeld { get; set; } = null;
 
     public Action OnClicked { get; set; } = null;
 
@@ -72,13 +122,18 @@ namespace Others.Controls
       Children.Add(control);
     }
 
+    public void RemoveChild(Control control)
+    {
+      Children.Remove(control);
+    }
+
     public virtual void Update(GameTime gameTime)
     {
       IsMouseOver = false;
       IsMouseDown = false;
       IsMouseClicked = false;
 
-      if (GameMouse.Intersects(Rectangle))
+      if (MouseRectangle.Intersects(Rectangle))
       {
         IsMouseOver = true;
         OnHover?.Invoke();
@@ -86,6 +141,11 @@ namespace Others.Controls
         if (GameMouse.IsLeftPressed)
         {
           IsMouseDown = true;
+          IsHeld = true;
+        }
+        else
+        {
+          IsHeld = false;
         }
 
         if (GameMouse.IsLeftClicked)
@@ -93,6 +153,18 @@ namespace Others.Controls
           IsMouseClicked = true;
           OnClicked?.Invoke();
         }
+      }
+      else
+      {
+        if (!GameMouse.IsLeftPressed)
+        {
+          IsHeld = false;
+        }
+      }
+
+      if (IsHeld)
+      {
+        OnHeld?.Invoke();
       }
 
       UpdateChildren(gameTime);
@@ -113,6 +185,28 @@ namespace Others.Controls
     {
       foreach (var child in Children)
         child.Draw(gameTime, spriteBatch);
+    }
+
+    public void AddTag(string value)
+    {
+      var tag = value.Trim().ToUpper();
+      if (HasTag(tag))
+        return;
+
+      Tags.Add(tag);
+    }
+
+    public bool HasTag(string value)
+    {
+      var v = value.Trim().ToUpper();
+
+      foreach (var tag in Tags)
+      {
+        if (tag.Trim().ToUpper() == v)
+          return true;
+      }
+
+      return false;
     }
   }
 }

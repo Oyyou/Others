@@ -121,7 +121,7 @@ namespace Others.States
       var panel = new Panel(panelTexture, new Vector2(0, 0));
       panel.Viewport = new Rectangle(0, (ZonerGame.ScreenHeight - 100) - panelTexture.Height, panelTexture.Width, panelTexture.Height);
       panel.AddChild(new Label(font, "Crafting") { Position = new Vector2(10, 20) });
-      panel.AddChild(new Button(buttonTexture, font, "Craft Hatchet") { Position = new Vector2(10, 40) });
+      panel.AddChild(new Button(buttonTexture, font, "Craft Hatchet") { Position = new Vector2(10, 40), OnClicked = () => _gwm.AddTask("craftAxe", 0, 0)});
       panel.AddChild(new Button(buttonTexture, font, "Craft Pickaxe") { Position = new Vector2(10, 90) });
       panel.AddChild(new Button(buttonTexture, font, "Craft Pickaxe") { Position = new Vector2(10, 140) });
       panel.AddChild(new Button(buttonTexture, font, "Craft Pickaxe") { Position = new Vector2(10, 190) });

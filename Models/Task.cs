@@ -17,6 +17,14 @@ namespace Others.Models
       public float Chance { get; set; }
     }
 
+    public class RequiredResource
+    {
+      [JsonProperty("name")]
+      public string Name { get; set; }
+      [JsonProperty("amount")]
+      public int Amount { get; set; }
+    }
+
     public class SkillRequirement
     {
       [JsonProperty("name")]
@@ -34,6 +42,9 @@ namespace Others.Models
 
     [JsonProperty("type")]
     public string Type { get; set; }
+
+    [JsonProperty("requiredResources")]
+    public List<RequiredResource> RequiredResources { get; set; }
 
     [JsonProperty("producedItems")]
     public List<ProducedItem> ProducedItems { get; set; }

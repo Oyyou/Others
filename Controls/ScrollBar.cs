@@ -21,6 +21,10 @@ namespace Others.Controls
     private float _min;
     private float _max;
 
+    private float _speed = 10f;
+
+    private float _remaining;
+
     private int _previousScrollValue;
 
     public override Rectangle Rectangle => new Rectangle((int)DrawPosition.X, (int)DrawPosition.Y, _backgroundTexture.Width, _backgroundTexture.Height);
@@ -45,7 +49,7 @@ namespace Others.Controls
       _downButton = new Button(downTexture) { Position = new Vector2(2, height - (_backgroundTexture.Width - 2)) };
 
       _min = _upButton.Rectangle.Bottom + 2;
-      _max = _downButton.Rectangle.Top - 2 - barTexture.Height;
+      _max = _downButton.Position.Y - 2 - barTexture.Height;
 
       _barButton = new Button(barTexture) { Position = new Vector2(2, _min), OnHeld = Bar_OnHeld };
 
@@ -62,16 +66,27 @@ namespace Others.Controls
         return;
       }
 
-      var size = (_downButton.Rectangle.Top - 2) - (_upButton.Rectangle.Bottom + 2);
+      var area = (_downButton.Rectangle.Top - 2f) - (_upButton.Rectangle.Bottom + 2f);
+      var ratio = (area / rectangle.Height);
+      var size = (int)(area * ratio);
+      var rationReverse = (area * (1 - ratio));
+
+      _speed = 10f;// area - size;
+
+      var a = (float)this.Parent.Rectangle.Height / (float)rectangle.Height;
+      var b = (this.Parent.Rectangle.Height * (1 - a));
+      var c = (float)rectangle.Height - (float)this.Parent.Rectangle.Height;
+      _remaining = c / (rationReverse / _speed);
 
       var barTexture = new Texture2D(_graphicsDevice, _backgroundTexture.Width - 4, size);
       barTexture.SetData(Helpers.GetBorder(barTexture, 1, Color.Black, Color.Gray));
 
+      _min = (_upButton.Position.Y + _upButton.Rectangle.Height) + 2;
+      _max = _downButton.Position.Y - 2 - barTexture.Height;
+
       RemoveChild(_barButton);
       _barButton = new Button(barTexture) { Position = new Vector2(2, _min), OnHeld = Bar_OnHeld };
       AddChild(_barButton);
-
-      _max = _downButton.Rectangle.Top - 2 - barTexture.Height;
 
       IsVisible = true;
     }
@@ -87,38 +102,16 @@ namespace Others.Controls
     {
       var newY = MathHelper.Clamp(y, _min, _max);
 
+      var change = newY - _min;
+      var percentage = change / _speed;
+      var offset = _remaining * percentage;
+
       _barButton.Position = new Vector2(_barButton.Position.X, newY);
-      this.Parent.ViewMatrix = Matrix.CreateTranslation(0, -(newY - _min), 0);
-      this.Parent.ChildrenOffset = new Vector2(0, -(newY - _min));
+      this.Parent.ChildrenOffset = new Vector2(0, -offset);
     }
 
     public override void Update(GameTime gameTime)
     {
-      if (GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.D1))
-      {
-        SetRectangle(new Rectangle(0, 0, 100, 100));
-      }
-
-      if (GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.D2))
-      {
-        SetRectangle(new Rectangle(0, 0, 100, 200));
-      }
-
-      if (GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.D3))
-      {
-        SetRectangle(new Rectangle(0, 0, 100, 300));
-      }
-
-      if (GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.D4))
-      {
-        SetRectangle(new Rectangle(0, 0, 100, 400));
-      }
-
-      if (GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.D5))
-      {
-        SetRectangle(new Rectangle(0, 0, 100, 500));
-      }
-
       if (!IsVisible)
         return;
 
@@ -135,13 +128,11 @@ namespace Others.Controls
         return;
       }
 
-      var speed = 10f;
-
       if (GameMouse.ScrollWheelValue < _previousScrollValue)
-        SetBarButtonY(_barButton.Position.Y + speed);
+        SetBarButtonY(_barButton.Position.Y + _speed);
 
       if (GameMouse.ScrollWheelValue > _previousScrollValue)
-        SetBarButtonY(_barButton.Position.Y - speed);
+        SetBarButtonY(_barButton.Position.Y - _speed);
 
       _previousScrollValue = GameMouse.ScrollWheelValue;
     }

@@ -42,8 +42,6 @@ namespace Others.Controls
       }
     }
 
-    public Matrix ViewMatrix = Matrix.CreateTranslation(0, 0, 0);
-
     public Vector2 ChildrenOffset = Vector2.Zero;
 
     public Rectangle Viewport = new Rectangle(0, 0, ZonerGame.ScreenWidth, ZonerGame.ScreenHeight);
@@ -99,6 +97,8 @@ namespace Others.Controls
 
     public Action OnClicked { get; set; } = null;
 
+    public Action<Control> OnAddChild { get; set; } = null;
+
     public Func<bool> GetVisibility = null;
 
     public Control()
@@ -120,6 +120,8 @@ namespace Others.Controls
     {
       control.AssignParent(this);
       Children.Add(control);
+
+      OnAddChild?.Invoke(this);
     }
 
     public void RemoveChild(Control control)

@@ -120,12 +120,46 @@ namespace Others.States
 
       var panel = new Panel(panelTexture, new Vector2(0, 0));
       panel.Viewport = new Rectangle(0, (ZonerGame.ScreenHeight - 100) - panelTexture.Height, panelTexture.Width, panelTexture.Height);
+      panel.OnAddChild = (panel) =>
+      {
+        var children = panel.Children.Where(c => !c.IsFixedPosition);
+        if (children.Count() == 0)
+          return;
+
+        var rectangle = new Rectangle(0, 0, 10, 10);
+        foreach(var child in children)
+        {
+          if (child.Rectangle.X < rectangle.X)
+            rectangle = new Rectangle(child.Rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
+
+          if (child.Rectangle.Y < rectangle.Y)
+            rectangle = new Rectangle(rectangle.X, child.Rectangle.Y, rectangle.Width, rectangle.Height);
+
+          if(child.Rectangle.Right > rectangle.Right)
+            rectangle = new Rectangle(rectangle.X, rectangle.Y, child.Rectangle.Right - rectangle.X, rectangle.Height);
+
+
+          if (child.Rectangle.Bottom > rectangle.Bottom)
+            rectangle = new Rectangle(rectangle.X, rectangle.Y, rectangle.Width, child.Rectangle.Bottom - rectangle.Y);
+        }
+
+        rectangle.Height += 10; // Padding :)
+
+        var scrollBar = (ScrollBar)panel.Children.Where(c => c is ScrollBar).FirstOrDefault();
+        if (scrollBar != null)
+        {
+          scrollBar.SetRectangle(rectangle);
+        }
+      };
       panel.AddChild(new Label(font, "Crafting") { Position = new Vector2(10, 20) });
-      panel.AddChild(new Button(buttonTexture, font, "Craft Hatchet") { Position = new Vector2(10, 40), OnClicked = () => _gwm.AddTask("craftAxe", 0, 0)});
+      panel.AddChild(new ScrollBar(GameModel.GraphicsDevice, font, panelTexture.Height - 10) { Position = new Vector2(panelTexture.Width - 25, 5), IsFixedPosition = true });
+      panel.AddChild(new Button(buttonTexture, font, "Craft Hatchet") { Position = new Vector2(10, 40) });
       panel.AddChild(new Button(buttonTexture, font, "Craft Pickaxe") { Position = new Vector2(10, 90) });
       panel.AddChild(new Button(buttonTexture, font, "Craft Pickaxe") { Position = new Vector2(10, 140) });
       panel.AddChild(new Button(buttonTexture, font, "Craft Pickaxe") { Position = new Vector2(10, 190) });
-      panel.AddChild(new ScrollBar(GameModel.GraphicsDevice, font, panelTexture.Height - 10) { Position = new Vector2(panelTexture.Width - 25, 5), IsFixedPosition = true });
+      panel.AddChild(new Button(buttonTexture, font, "Craft Pickaxe") { Position = new Vector2(10, 240) });
+      panel.AddChild(new Button(buttonTexture, font, "Craft Pickaxe") { Position = new Vector2(10, 290) });
+      panel.AddChild(new Button(buttonTexture, font, "Craft Pickaxe") { Position = new Vector2(10, 340) });
       panel.AddTag("Main");
       panel.AddTag("Crafting");
 

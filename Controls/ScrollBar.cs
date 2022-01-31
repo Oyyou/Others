@@ -16,7 +16,7 @@ namespace Others.Controls
 
     private Button _upButton;
     private Button _downButton;
-    private Button _barButton;
+    private Button _thumbButton;
 
     private float _min;
     private float _max;
@@ -45,16 +45,16 @@ namespace Others.Controls
       var barTexture = new Texture2D(graphicsDevice, _backgroundTexture.Width - 4, 50);
       barTexture.SetData(Helpers.GetBorder(barTexture, 1, Color.Black, Color.Gray));
 
-      _upButton = new Button(upTexture) { Position = new Vector2(2, 2) };
-      _downButton = new Button(downTexture) { Position = new Vector2(2, height - (_backgroundTexture.Width - 2)) };
+      _upButton = new Button(upTexture) { Position = new Vector2(2, 2), OnClicked = () => SetBarButtonY(_thumbButton.Position.Y - _speed) };
+      _downButton = new Button(downTexture) { Position = new Vector2(2, height - (_backgroundTexture.Width - 2)), OnClicked = () => SetBarButtonY(_thumbButton.Position.Y + _speed) };
 
       _min = _upButton.Rectangle.Bottom + 2;
       _max = _downButton.Position.Y - 2 - barTexture.Height;
 
-      _barButton = new Button(barTexture) { Position = new Vector2(2, _min), OnHeld = Bar_OnHeld };
+      _thumbButton = new Button(barTexture) { Position = new Vector2(2, _min), OnHeld = Bar_OnHeld };
 
       AddChild(_upButton);
-      AddChild(_barButton);
+      AddChild(_thumbButton);
       AddChild(_downButton);
     }
 
@@ -71,7 +71,7 @@ namespace Others.Controls
       var size = (int)(area * ratio);
       var rationReverse = (area * (1 - ratio));
 
-      _speed = 10f;// area - size;
+      _speed = 10f;
 
       var a = (float)this.Parent.Rectangle.Height / (float)rectangle.Height;
       var b = (this.Parent.Rectangle.Height * (1 - a));
@@ -84,9 +84,9 @@ namespace Others.Controls
       _min = (_upButton.Position.Y + _upButton.Rectangle.Height) + 2;
       _max = _downButton.Position.Y - 2 - barTexture.Height;
 
-      RemoveChild(_barButton);
-      _barButton = new Button(barTexture) { Position = new Vector2(2, _min), OnHeld = Bar_OnHeld };
-      AddChild(_barButton);
+      RemoveChild(_thumbButton);
+      _thumbButton = new Button(barTexture) { Position = new Vector2(2, _min), OnHeld = Bar_OnHeld };
+      AddChild(_thumbButton);
 
       IsVisible = true;
     }
@@ -95,7 +95,7 @@ namespace Others.Controls
     {
       var position = MousePosition - this.DrawPosition;
 
-      SetBarButtonY(position.Y - (_barButton.Rectangle.Height / 2));
+      SetBarButtonY(position.Y - (_thumbButton.Rectangle.Height / 2));
     }
 
     private void SetBarButtonY(float y)
@@ -106,7 +106,7 @@ namespace Others.Controls
       var percentage = change / _speed;
       var offset = _remaining * percentage;
 
-      _barButton.Position = new Vector2(_barButton.Position.X, newY);
+      _thumbButton.Position = new Vector2(_thumbButton.Position.X, newY);
       this.Parent.ChildrenOffset = new Vector2(0, -offset);
     }
 
@@ -129,10 +129,10 @@ namespace Others.Controls
       }
 
       if (GameMouse.ScrollWheelValue < _previousScrollValue)
-        SetBarButtonY(_barButton.Position.Y + _speed);
+        SetBarButtonY(_thumbButton.Position.Y + _speed);
 
       if (GameMouse.ScrollWheelValue > _previousScrollValue)
-        SetBarButtonY(_barButton.Position.Y - _speed);
+        SetBarButtonY(_thumbButton.Position.Y - _speed);
 
       _previousScrollValue = GameMouse.ScrollWheelValue;
     }

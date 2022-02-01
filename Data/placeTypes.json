@@ -5,6 +5,7 @@
     "Idle",
     "Storage",
     "Production",
-    "Gathering"
+    "Gathering",
+    "Household"
   ]
 }

@@ -33,6 +33,9 @@ namespace Others.Models
     [JsonProperty("places")]
     public List<PlaceWrapper> Places { get; set; } = new List<PlaceWrapper>();
 
+    [JsonProperty("households")]
+    public List<Household> Households { get; set; } = new List<Household>();
+
     public GatherableResources GatherableResources { get; set; } = new GatherableResources();
 
     //[JsonProperty("attributes")]

@@ -1,6 +1,12 @@
 {
   "places": [
     {
+      "name": "house",
+      "type": "Household",
+      "description": "Somewhere for ya boiis to live",
+      "collisionType": "None"
+    },
+    {
       "name": "goldOre",
       "skill": "mining",
       "type": "Collection",

@@ -65,7 +65,7 @@ namespace Others.Entities
         AddComponent(new TextureComponent(this, _collisionTexture, () => _state.ShowCollisionBox) { Layer = 0.96f, });
       AddComponent(new TextureComponent(this, _hoveringTexture, () => IsHovering) { Layer = 0.961f, });
       AddComponent(new TextureComponent(this, _selectedTexture, () => IsSelected) { Layer = 0.962f, });
-      AddComponent(new MappedComponent(this, Wrapper.Data.CollisionType == Models.Place.CollisionTypes.Full ? '1' : '0', () => new Rectangle(_point.X, _point.Y, Wrapper.Data.Width, Wrapper.Data.Height)));
+      AddComponent(new MappedComponent(this, Wrapper.Data.CollisionType == Models.Place.CollisionTypes.Full ? '1' : '0', () => new Rectangle(_point.X, _point.Y, Wrapper.Width, Wrapper.Height)));
       AddComponent(new SelectableComponent(this, () => _rectangle)
       {
         OnHover = () =>

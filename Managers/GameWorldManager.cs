@@ -183,7 +183,24 @@ namespace Others.Managers
       }
     }
 
-    public void AddVillager(string name, Point mapPoint, Dictionary<string, float> skills = null)
+    public Household AddHousehold(string name, Rectangle size)
+    {
+      var place = AddPlace("house", new Point(size.X, size.Y));
+      place.Width = size.Width;
+      place.Height = size.Height;
+
+      var household = new Household()
+      {
+        Id = GetId("household"),
+        Name = name,
+      };
+
+      GameWorld.Households.Add(household);
+
+      return household;
+    }
+
+    public Villager AddVillager(string name, Point mapPoint, Dictionary<string, float> skills = null)
     {
       var villager = new Villager(name)
       {
@@ -200,6 +217,8 @@ namespace Others.Managers
 
       GameWorld.Villagers.Add(villager);
       _state.AddVillagerEntity(villager);
+
+      return villager;
     }
 
     public void Update(GameTime gameTime)
@@ -253,7 +272,13 @@ namespace Others.Managers
       }
     }
 
-    public PlaceWrapper GetPlaceById(int id)
+    public Villager GetVillagerById(long id)
+    {
+      return GameWorld.Villagers.FirstOrDefault(
+        c => c.Id == id);
+    }
+
+    public PlaceWrapper GetPlaceById(long id)
     {
       return GameWorld.Places.FirstOrDefault(
                       c => c.Id == id);
@@ -331,6 +356,11 @@ namespace Others.Managers
           villager.Load(GameWorld);
           _state.AddVillagerEntity(villager);
         }
+
+        foreach(var household in GameWorld.Households)
+        {
+          household.Load(this);
+        }
       }
       else
       {
@@ -345,7 +375,10 @@ namespace Others.Managers
 
     private void SetDefaultWorld()
     {
-      AddVillager("Kyle", new Point(0, 0), new Dictionary<string, float>() { { "mining", 1 }, { "chopping", 1 } });
+      var kyle = AddVillager("Kyle", new Point(0, 0), new Dictionary<string, float>() { { "mining", 1 }, { "chopping", 1 } });
+
+      var umneyHousehold = AddHousehold("Umney", new Rectangle(11, 3, 5, 5));
+      umneyHousehold.AssignVillager(kyle);
       //AddVillager("Niall", new Dictionary<string, float>() { { "chopping", 1 } });
 
       AddPlace("goldOre", 1, 1);

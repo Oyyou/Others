@@ -6,6 +6,9 @@
     "Storage",
     "Production",
     "Gathering",
-    "Household"
+    "Household",
+    "Wall",
+    "Door",
+    "Floor"
   ]
 }

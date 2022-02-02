@@ -155,7 +155,7 @@ namespace Others.Managers
 
         AddPlace(placeName, randomPoint);
 
-        emptyPoints.RemoveAt(index);        
+        emptyPoints.RemoveAt(index);
       }
     }
 
@@ -194,6 +194,26 @@ namespace Others.Managers
         Id = GetId("household"),
         Name = name,
       };
+
+      for (int y = size.Y; y < size.Bottom; y++)
+      {
+        for (int x = size.X; x < size.Right; x++)
+        {
+          var addWall = y == size.Y ||
+            x == size.X ||
+            y == (size.Bottom - 1) ||
+            x == (size.Right - 1);
+
+          var addDoor = y == (size.Bottom - 1) && (x == size.X + (size.Width / 2));
+
+          if (addDoor)
+            AddPlace("woodenDoor", x, y);
+          else if (addWall)
+            AddPlace("woodenWall", x, y);
+          else
+            AddPlace("woodenFloor", x, y);
+        }
+      }
 
       GameWorld.Households.Add(household);
 
@@ -357,7 +377,7 @@ namespace Others.Managers
           _state.AddVillagerEntity(villager);
         }
 
-        foreach(var household in GameWorld.Households)
+        foreach (var household in GameWorld.Households)
         {
           household.Load(this);
         }

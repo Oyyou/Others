@@ -41,6 +41,9 @@ namespace Others.Models
     [JsonProperty("height")]
     public int Height { get; set; } = 1;
 
+    [JsonProperty("layer")]
+    public float Layer { get; set; } = -1;
+
     [JsonProperty("xOriginPercentage")]
     public int XOriginPercentage { get; set; }
 

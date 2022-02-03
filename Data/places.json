@@ -22,7 +22,8 @@
       "name": "woodenFloor",
       "type": "Floor",
       "description": "floor",
-      "collisionType": "None"
+      "collisionType": "None",
+      "layer": 0.0,
     },
     {
       "name": "goldOre",

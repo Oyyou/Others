@@ -280,7 +280,7 @@ namespace Others.States
         var texture = _content.Load<Texture2D>($"Places/{place.Name}");
         var xOffset = place.Data.XOriginPercentage != 0 ? (place.Data.XOriginPercentage / 100f) * texture.Width : 0;
         var yOffset = place.Data.YOriginPercentage != 0 ? (place.Data.YOriginPercentage / 100f) * texture.Height : 0;
-        var placeEntity = new Place(place, texture, this) { Layer = 0.09f, PositionOffset = new Vector2(xOffset, yOffset), };
+        var placeEntity = new Place(place, texture, this) { Layer = place.Data.Layer >= 0 ? place.Data.Layer : 0.09f, PositionOffset = new Vector2(xOffset, yOffset), };
 
         AddEntity(placeEntity);
 

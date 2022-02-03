@@ -282,7 +282,7 @@ namespace Others.Managers
     {
       var value = GameWorld.Places
         .Where(c => c.Data.Type == "Storage" && c.AdditionalProperties.ContainsKey("inventory"))
-        .SelectMany(c => /*(object)*/c.AdditionalProperties["inventory"].ToDictionary<string, int>())
+        .SelectMany(c => ((object)c.AdditionalProperties["inventory"].Value).ToDictionary<string, int>())
         .GroupBy(c => c.Key)
         .ToDictionary(c => c.Key, v => v.Sum(b => b.Value));
 

@@ -176,7 +176,6 @@ namespace Others.Models
 
     public void DoCollectionTask(GameWorldManager gwm)
     {
-      var items = gwm.GameWorld.ItemData;
       var place = GetCurrentPlace(gwm);
 
       _taskTimer += 0.01f;
@@ -194,15 +193,7 @@ namespace Others.Models
 
           if (rand < chance)
           {
-            if (!Inventory.ContainsKey(item.Name))
-            {
-              var itemWrapper = new ItemWrapper();
-              itemWrapper.LoadFromData(items[item.Name]);
-
-              Inventory.Add(item.Name, itemWrapper);
-            }
-
-            Inventory[item.Name].Count++;
+            AddToInventory(gwm, item);
 
             var health = (long)place.AdditionalProperties["health"].Value - 1;
             place.AdditionalProperties["health"].Value = health;
@@ -220,6 +211,21 @@ namespace Others.Models
           }
         }
       }
+    }
+
+    private void AddToInventory(GameWorldManager gwm, Task.ProducedItem item)
+    {
+      var items = gwm.GameWorld.ItemData;
+
+      if (!Inventory.ContainsKey(item.Name))
+      {
+        var itemWrapper = new ItemWrapper();
+        itemWrapper.LoadFromData(items[item.Name]);
+
+        Inventory.Add(item.Name, itemWrapper);
+      }
+
+      Inventory[item.Name].Count++;
     }
 
     public void DoSleepingTask(GameWorldManager gwm)
@@ -282,9 +288,9 @@ namespace Others.Models
     {
       //var places = Current;
       var task = CurrentTask.Data;
-      var itemWrapper = new ItemWrapper();
       var inv = gwm.GetInventory();
-      var item = CurrentTask.Data.ProducedItems[0].Name;
+      var producedItem = CurrentTask.Data.ProducedItems[0];
+      var item = producedItem.Name;
       bool HasRequiredResources = true;
 
       TextInfo textInfo = new CultureInfo("en-EU", false).TextInfo;
@@ -292,10 +298,11 @@ namespace Others.Models
       //loop task for resources required
       foreach (var requireResource in task.RequiredResources)
       {
-        if (!inv.ContainsKey(requireResource.Name))
+        if (!inv.ContainsKey(requireResource.Name) && !this.Inventory.ContainsKey(requireResource.Name))
         {
           HasRequiredResources = false;
-          gwm.AddTask($"gather{textInfo.ToTitleCase(requireResource.Name)}", 0, CurrentTask.PlaceId);
+          var place = gwm.GameWorld.Places.FirstOrDefault(c => c.Name == requireResource.Name);
+          gwm.AddTask($"gather{textInfo.ToTitleCase(requireResource.Name)}", 0, place.Id);
         }
       }
       //check if inv has resouces
@@ -303,10 +310,12 @@ namespace Others.Models
       //check if has resouce required is true
       if (HasRequiredResources)
       {
-        Inventory.Add(item, itemWrapper);
+        AddToInventory(gwm, producedItem);
+        CurrentTask = null;
       }
       else
       {
+        gwm.AddTask(CurrentTask.Name, CurrentTask.Priority, CurrentTask.PlaceId);
         CurrentTask = null;
       }
     }

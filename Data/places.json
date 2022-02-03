@@ -28,11 +28,9 @@
           "value": 100,
           "isVisible": false
         },
-        "additionalProperties": {
-          "health": {
-            "value": 1,
-            "isVisible": true
-          }
+        "health": {
+          "value": 1,
+          "isVisible": true
         }
       }
     },
@@ -51,11 +49,9 @@
           "value": 100,
           "isVisible": false
         },
-        "additionalProperties": {
-          "health": {
-            "value": 1,
-            "isVisible": true
-          }
+        "health": {
+          "value": 1,
+          "isVisible": true
         }
       }
     },

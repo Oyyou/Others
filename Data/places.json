@@ -15,6 +15,7 @@
     },
     {
       "name": "rocks",
+      "skill": "gathering",
       "type": "Gathering",
       "description": "Just some rocks on the floor",
       "collisionType": "None",
@@ -26,11 +27,18 @@
         "max": {
           "value": 100,
           "isVisible": false
+        },
+        "additionalProperties": {
+          "health": {
+            "value": 1,
+            "isVisible": true
+          }
         }
       }
     },
     {
       "name": "sticks",
+      "skill" : "gathering",
       "type": "Gathering",
       "description": "Cheeky pile of sticks on the floor",
       "collisionType": "None",
@@ -42,6 +50,12 @@
         "max": {
           "value": 100,
           "isVisible": false
+        },
+        "additionalProperties": {
+          "health": {
+            "value": 1,
+            "isVisible": true
+          }
         }
       }
     },

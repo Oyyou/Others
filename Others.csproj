@@ -53,6 +53,12 @@
     <None Update="Data\Tasks\craftAxe-task.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Data\Tasks\gatherRocks-task.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Tasks\gatherSticks-task.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Data\Tasks\idle-task.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

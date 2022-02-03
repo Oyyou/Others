@@ -1,5 +1,5 @@
-﻿{
-  "name" : "craftAxe",
+{
+  "name": "craftAxe",
   "type": "Crafting",
   "skillRequirements": [
     {
@@ -13,7 +13,7 @@
       "amount": 2
     },
     {
-      "name": "rock",
+      "name": "rocks",
       "amount": 1
     }
   ],

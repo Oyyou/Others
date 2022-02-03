@@ -1,0 +1,17 @@
+{
+  "name": "gatherRocks",
+  "rate": 1,
+  "type": "Collection",
+  "skillRequirements": [
+    {
+      "name": "gathering",
+      "level": 1
+    }
+  ],
+  "producedItems": [
+    {
+      "name": "rocks",
+      "chance": 1
+    }
+  ]
+}

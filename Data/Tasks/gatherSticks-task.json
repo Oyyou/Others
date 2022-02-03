@@ -1,0 +1,17 @@
+{
+  "name": "gatherSticks",
+  "rate": 1,
+  "type": "Collection",
+  "skillRequirements": [
+    {
+      "name": "gathering",
+      "level": 1
+    }
+  ],
+  "producedItems": [
+    {
+      "name": "sticks",
+      "chance": 1
+    }
+  ]
+}

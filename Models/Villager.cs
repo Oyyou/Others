@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Others.Managers;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -277,14 +278,37 @@ namespace Others.Models
       CurrentTask = null;
     }
 
-    public void DoGatheringTask(GameWorldManager gwm)
+    public void DoCraftingTask(GameWorldManager gwm)
     {
+      //var places = Current;
+      var task = CurrentTask.Data;
+      var itemWrapper = new ItemWrapper();
+      var inv = gwm.GetInventory();
+      var item = CurrentTask.Data.ProducedItems[0].Name;
+      bool HasRequiredResources = true;
 
-    }
+      TextInfo textInfo = new CultureInfo("en-EU", false).TextInfo;
 
-    public void SetCraftingTask(GameWorldManager gwm)
-    {
+      //loop task for resources required
+      foreach (var requireResource in task.RequiredResources)
+      {
+        if (!inv.ContainsKey(requireResource.Name))
+        {
+          HasRequiredResources = false;
+          gwm.AddTask($"gather{textInfo.ToTitleCase(requireResource.Name)}", 0, CurrentTask.PlaceId);
+        }
+      }
+      //check if inv has resouces
 
+      //check if has resouce required is true
+      if (HasRequiredResources)
+      {
+        Inventory.Add(item, itemWrapper);
+      }
+      else
+      {
+        CurrentTask = null;
+      }
     }
 
     public void DoTravellingTask(GameWorldManager gwm)

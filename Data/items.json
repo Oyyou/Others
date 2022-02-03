@@ -13,11 +13,11 @@
       "weight": 0.3
     },
     {
-      "name": "rock",
+      "name": "rocks",
       "weight": 0.1
     },
     {
-      "name": "stick",
+      "name": "sticks",
       "weight": 0.1
     }
   ]

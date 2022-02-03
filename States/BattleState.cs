@@ -127,7 +127,7 @@ namespace Others.States
           return;
 
         var rectangle = new Rectangle(0, 0, 10, 10);
-        foreach(var child in children)
+        foreach (var child in children)
         {
           if (child.Rectangle.X < rectangle.X)
             rectangle = new Rectangle(child.Rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
@@ -135,7 +135,7 @@ namespace Others.States
           if (child.Rectangle.Y < rectangle.Y)
             rectangle = new Rectangle(rectangle.X, child.Rectangle.Y, rectangle.Width, rectangle.Height);
 
-          if(child.Rectangle.Right > rectangle.Right)
+          if (child.Rectangle.Right > rectangle.Right)
             rectangle = new Rectangle(rectangle.X, rectangle.Y, child.Rectangle.Right - rectangle.X, rectangle.Height);
 
 
@@ -153,7 +153,7 @@ namespace Others.States
       };
       panel.AddChild(new Label(font, "Crafting") { Position = new Vector2(10, 20) });
       panel.AddChild(new ScrollBar(GameModel.GraphicsDevice, font, panelTexture.Height - 10) { Position = new Vector2(panelTexture.Width - 25, 5), IsFixedPosition = true });
-      panel.AddChild(new Button(buttonTexture, font, "Craft Hatchet") { Position = new Vector2(10, 40) });
+      panel.AddChild(new Button(buttonTexture, font, "Craft Hatchet") { Position = new Vector2(10, 40), OnClicked = () => _gwm.AddTask("craftAxe", 0, 0) });
       panel.AddChild(new Button(buttonTexture, font, "Craft Pickaxe") { Position = new Vector2(10, 90) });
       panel.AddChild(new Button(buttonTexture, font, "Craft Pickaxe") { Position = new Vector2(10, 140) });
       panel.AddChild(new Button(buttonTexture, font, "Craft Pickaxe") { Position = new Vector2(10, 190) });

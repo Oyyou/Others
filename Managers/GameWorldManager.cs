@@ -155,7 +155,7 @@ namespace Others.Managers
 
         AddPlace(placeName, randomPoint);
 
-        emptyPoints.RemoveAt(index);        
+        emptyPoints.RemoveAt(index);
       }
     }
 
@@ -277,11 +277,12 @@ namespace Others.Managers
     /// Might not work
     /// </summary>
     /// <returns>Error (maybe?)</returns>
+    /// (object)???
     public Dictionary<string, int> GetInventory()
     {
       var value = GameWorld.Places
         .Where(c => c.Data.Type == "Storage" && c.AdditionalProperties.ContainsKey("inventory"))
-        .SelectMany(c => c.AdditionalProperties["inventory"].ToDictionary<string, int>())
+        .SelectMany(c => /*(object)*/c.AdditionalProperties["inventory"].ToDictionary<string, int>())
         .GroupBy(c => c.Key)
         .ToDictionary(c => c.Key, v => v.Sum(b => b.Value));
 
@@ -345,20 +346,19 @@ namespace Others.Managers
 
     private void SetDefaultWorld()
     {
-      AddVillager("Kyle", new Point(0, 0), new Dictionary<string, float>() { { "mining", 1 }, { "chopping", 1 } });
-      //AddVillager("Niall", new Dictionary<string, float>() { { "chopping", 1 } });
+      AddVillager("Kyle", new Point(0, 0), new Dictionary<string, float>() { { "mining", 1 }, { "chopping", 1 }, { "crafting", 1 }, { "gathering", 1 } });
 
       AddPlace("goldOre", 1, 1);
-      AddPlace("goldOre", 2, 1);
-      AddPlace("goldOre", 4, 4);
-      AddPlace("goldOre", 5, 3);
-      AddPlace("goldOre", 5, 1);
-      AddPlace("goldOre", 5, 6);
-      AddPlace("goldOre", 7, 2);
-      AddPlace("goldOre", 10, 4);
-      AddPlace("goldOre", 5, 8);
-      AddPlace("goldOre", 1, 4);
-      AddPlace("goldOre", 2, 2);
+      //AddPlace("goldOre", 2, 1);
+      //AddPlace("goldOre", 4, 4);
+      //AddPlace("goldOre", 5, 3);
+      //AddPlace("goldOre", 5, 1);
+      //AddPlace("goldOre", 5, 6);
+      //AddPlace("goldOre", 7, 2);
+      //AddPlace("goldOre", 10, 4);
+      //AddPlace("goldOre", 5, 8);
+      //AddPlace("goldOre", 1, 4);
+      //AddPlace("goldOre", 2, 2);
 
       AddPlace("rocks", 1, 2);
 

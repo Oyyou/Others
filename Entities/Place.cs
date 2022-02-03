@@ -28,6 +28,8 @@ namespace Others.Entities
 
     public Vector2 PositionOffset = Vector2.Zero;
 
+    public Color Colour { get; set; } = Color.White;
+
     public bool IsSelected { get; set; } = false;
 
     public bool IsHovering { get; set; } = false;
@@ -60,7 +62,7 @@ namespace Others.Entities
     {
       var origin = new Vector2(_texture.Width / 2, _texture.Height / 2);
 
-      AddComponent(new TextureComponent(this, _texture) { Layer = (Layer + (Position + origin).Y / 1000f), PositionOffset = PositionOffset });
+      AddComponent(new TextureComponent(this, _texture) { Layer = (Layer + (Position + origin).Y / 1000f), PositionOffset = PositionOffset, Colour = Colour });
       if (Wrapper.Data.CollisionType == Models.Place.CollisionTypes.Full)
         AddComponent(new TextureComponent(this, _collisionTexture, () => _state.ShowCollisionBox) { Layer = 0.96f, });
       AddComponent(new TextureComponent(this, _hoveringTexture, () => IsHovering) { Layer = 0.961f, });

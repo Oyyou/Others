@@ -114,7 +114,7 @@ namespace Others.Managers
       return false;
     }
 
-    public PlaceWrapper AddPlace(string placeName, int x, int y)
+    public PlaceWrapper AddPlace(string placeName, int x, int y, Dictionary<string, string> additionalValues = null)
     {
       if (!GameWorld.PlaceData.ContainsKey(placeName))
       {
@@ -128,7 +128,7 @@ namespace Others.Managers
       place.LoadFromData((Place)GameWorld.PlaceData[placeName].Clone());
       GameWorld.Places.Add(place);
 
-      _state.AddPlaceEntity(place);
+      _state.AddPlaceEntity(place, additionalValues);
 
       return place;
     }
@@ -209,7 +209,23 @@ namespace Others.Managers
           if (addDoor)
             AddPlace("woodenDoor", x, y);
           else if (addWall)
-            AddPlace("woodenWall", x, y);
+          {
+            bool hasLeft = x > size.X;
+            bool hasRight = x < (size.Right - 1);
+            bool hasTop = y > size.Y;
+            bool hasBottom = y < (size.Bottom - 1);
+
+            var wallType = "bottom";
+
+            if (hasTop && hasBottom)
+              wallType = "middle";
+            else if (!hasTop && hasBottom)
+              wallType = "top";
+            else if (hasTop && !hasBottom)
+              wallType = "bottom";
+
+            AddPlace("woodenWall", x, y, new Dictionary<string, string>() { { "wallType", wallType } });
+          }
           else
             AddPlace("woodenFloor", x, y);
         }
@@ -218,6 +234,19 @@ namespace Others.Managers
       GameWorld.Households.Add(household);
 
       return household;
+    }
+
+    private string GetWallType(bool hasLeft, bool hasRight, bool hasTop, bool hasBottom)
+    {
+      string result = "";
+
+      if(hasTop)
+      {
+
+      }
+
+
+      return result;
     }
 
     public Villager AddVillager(string name, Point mapPoint, Dictionary<string, float> skills = null)

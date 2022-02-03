@@ -272,14 +272,23 @@ namespace Others.States
       _entities.Add(entity);
     }
 
-    public Entity AddPlaceEntity(Models.PlaceWrapper place)
+    public Entity AddPlaceEntity(Models.PlaceWrapper place, Dictionary<string, string> additionalValues = null)
     {
       try
       {
-        var texture = _content.Load<Texture2D>($"Places/{place.Name}");
+        string textureName = $"Places/{place.Name}";
+
+        // Special wall logic that requires us to know what part of the wall we're in
+        // UUUUUUGH
+        if (place.Data.Type == "Wall")
+        {
+          textureName = $"Places/Walls/{additionalValues["wallType"]}";
+        }
+
+        var texture = _content.Load<Texture2D>(textureName);
         var xOffset = place.Data.XOriginPercentage != 0 ? (place.Data.XOriginPercentage / 100f) * texture.Width : 0;
         var yOffset = place.Data.YOriginPercentage != 0 ? (place.Data.YOriginPercentage / 100f) * texture.Height : 0;
-        var placeEntity = new Place(place, texture, this) { Layer = place.Data.Layer >= 0 ? place.Data.Layer : 0.09f, PositionOffset = new Vector2(xOffset, yOffset), };
+        var placeEntity = new Place(place, texture, this) { Layer = place.Data.Layer >= 0 ? place.Data.Layer : 0.09f, PositionOffset = new Vector2(xOffset, yOffset), Colour = place.Data.Tint };
 
         AddEntity(placeEntity);
 

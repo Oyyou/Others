@@ -10,7 +10,13 @@
       "name": "woodenWall",
       "type": "Wall",
       "description": "This is obviously a wall",
-      "collisionType": "Full"
+      "collisionType": "Full",
+      "tint": {
+        "B": 74,
+        "G": 85,
+        "R": 108,
+        "A": 255
+      }
     },
     {
       "name": "woodenDoor",

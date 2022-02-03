@@ -50,6 +50,9 @@ namespace Others.Models
     [JsonProperty("yOriginPercentage")]
     public int YOriginPercentage { get; set; }
 
+    [JsonProperty("tint")]
+    public Color Tint { get; set; } = Color.White;// "255.255.255";
+
     [JsonProperty("additionalProperties")]
     public Dictionary<string, AdditionalProperty> AdditionalProperties { get; set; } = new Dictionary<string, AdditionalProperty>();
 

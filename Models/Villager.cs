@@ -30,6 +30,9 @@ namespace Others.Models
     [JsonProperty("id")]
     public long Id;
 
+    [JsonProperty("householdId")]
+    public long HouseholdId;
+
     [JsonProperty("name")]
     public string Name { get; set; }
 
@@ -59,6 +62,9 @@ namespace Others.Models
 
     [JsonProperty("currentPlaceId")]
     public long CurrentPlaceId { get; set; }
+
+    [JsonIgnore]
+    public Household Household { get; set; }
 
     public enum VillagerStates
     {
@@ -518,6 +524,12 @@ namespace Others.Models
           i--;
         }
       }
+
+      var household = gameWord.Households.FirstOrDefault(c => c.Id == this.HouseholdId);
+      if (household == null)
+        throw new ApplicationException($"{Name} is homeless!"); // Delete your save.json to load the new default game
+
+      household.AssignVillager(this);
     }
   }
 }

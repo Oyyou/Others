@@ -1,6 +1,30 @@
 {
   "places": [
     {
+      "name": "house",
+      "type": "Household",
+      "description": "Somewhere for ya boiis to live",
+      "collisionType": "None"
+    },
+    {
+      "name": "woodenWall",
+      "type": "Wall",
+      "description": "This is obviously a wall",
+      "collisionType": "Full"
+    },
+    {
+      "name": "woodenDoor",
+      "type": "Door",
+      "description": "It's like a wall, but isn't",
+      "collisionType": "None"
+    },
+    {
+      "name": "woodenFloor",
+      "type": "Floor",
+      "description": "floor",
+      "collisionType": "None"
+    },
+    {
       "name": "goldOre",
       "skill": "mining",
       "type": "Collection",

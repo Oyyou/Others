@@ -5,6 +5,10 @@
     "Idle",
     "Storage",
     "Production",
-    "Gathering"
+    "Gathering",
+    "Household",
+    "Wall",
+    "Door",
+    "Floor"
   ]
 }

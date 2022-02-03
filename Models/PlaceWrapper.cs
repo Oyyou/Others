@@ -18,6 +18,12 @@ namespace Others.Models
     [JsonProperty("additionalProperties")]
     public Dictionary<string, AdditionalProperty> AdditionalProperties { get; set; } = null;
 
+    [JsonProperty("width")]
+    public int Width { get; set; }
+
+    [JsonProperty("height")]
+    public int Height { get; set; }
+
     [JsonIgnore]
     public bool IsRemoved { get; set; } = false;
 
@@ -33,6 +39,8 @@ namespace Others.Models
     {
       Data = place;
       Name = Data.Name;
+      Width = Data.Width;
+      Height = Data.Height;
       AdditionalProperties = Data.AdditionalProperties;
     }
 

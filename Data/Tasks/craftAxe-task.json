@@ -1,0 +1,26 @@
+{
+  "name": "craftAxe",
+  "type": "Crafting",
+  "skillRequirements": [
+    {
+      "name": "crafting",
+      "level": 1
+    }
+  ],
+  "requiredResources": [
+    {
+      "name": "sticks",
+      "amount": 2
+    },
+    {
+      "name": "rocks",
+      "amount": 1
+    }
+  ],
+  "producedItems": [
+    {
+      "name": "woodenAxe",
+      "amount": 1
+    }
+  ]
+}

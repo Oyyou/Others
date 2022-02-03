@@ -2,13 +2,14 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using ZonerEngine.GL;
 using ZonerEngine.GL.Input;
 
 namespace Others.Controls
 {
-  public abstract class Control
+  public abstract class Control : IClickable
   {
     public Control Parent { get; private set; }
 
@@ -17,6 +18,8 @@ namespace Others.Controls
     public Vector2 Position { get; set; }
 
     public float Layer { get; set; }
+
+    public float LayerOffset { get; set; }
 
     public bool IsVisible { get; set; } = false;
 
@@ -38,9 +41,11 @@ namespace Others.Controls
     {
       get
       {
-        return Parent != null ? Parent.DrawLayer + 0.01f : Layer;
+        return (Parent != null ? Parent.DrawLayer + 0.01f : Layer) + LayerOffset;
       }
     }
+
+    public float ClickLayer => DrawLayer;
 
     public Vector2 ChildrenOffset = Vector2.Zero;
 
@@ -101,6 +106,15 @@ namespace Others.Controls
 
     public Func<bool> GetVisibility = null;
 
+    public bool IsClickable
+    {
+      get
+      {
+        return GameMouse.ValidObject == this ||
+          this.Children.Any(c => c.IsClickable);
+      }
+    }
+
     public Control()
     {
 
@@ -137,27 +151,33 @@ namespace Others.Controls
 
       if (MouseRectangle.Intersects(Rectangle))
       {
-        IsMouseOver = true;
-        OnHover?.Invoke();
+        GameMouse.AddObject(this);
 
-        if (GameMouse.IsLeftPressed)
+        if (IsClickable)
         {
-          IsMouseDown = true;
-          IsHeld = true;
-        }
-        else
-        {
-          IsHeld = false;
-        }
+          IsMouseOver = true;
+          OnHover?.Invoke();
 
-        if (GameMouse.IsLeftClicked)
-        {
-          IsMouseClicked = true;
-          OnClicked?.Invoke();
+          if (GameMouse.IsLeftPressed)
+          {
+            IsMouseDown = true;
+            IsHeld = true;
+          }
+          else
+          {
+            IsHeld = false;
+          }
+
+          if (GameMouse.IsLeftClicked)
+          {
+            IsMouseClicked = true;
+            OnClicked?.Invoke();
+          }
         }
       }
       else
       {
+        GameMouse.ClickableObjects.Remove(this);
         if (!GameMouse.IsLeftPressed)
         {
           IsHeld = false;

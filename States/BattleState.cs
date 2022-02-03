@@ -191,7 +191,6 @@ namespace Others.States
           if (child.Rectangle.Right > rectangle.Right)
             rectangle = new Rectangle(rectangle.X, rectangle.Y, child.Rectangle.Right - rectangle.X, rectangle.Height);
 
-
           if (child.Rectangle.Bottom > rectangle.Bottom)
             rectangle = new Rectangle(rectangle.X, rectangle.Y, rectangle.Width, child.Rectangle.Bottom - rectangle.Y);
         }
@@ -317,6 +316,9 @@ namespace Others.States
     {
       if (GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.G))
         ShowGrid = !ShowGrid;
+
+      //if (GameKeyboard.IsKeyPressed(Keys.M))
+      //  Map.WriteMap();
 
       //if (GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.C))
       //  ShowCollisionBox = !ShowCollisionBox;

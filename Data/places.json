@@ -113,7 +113,7 @@
       "description": "",
       "collisionType": "Full",
       "width": 1,
-      "height": 2,
+      "height": 1,
       "xOriginPercentage": -25,
       "yOriginPercentage": -5,
       "additionalProperties": {
@@ -130,7 +130,9 @@
       "description": "When ya bois gotta catch some Zzz's'",
       "collisionType": "Full",
       "xOriginPercentage": 0,
-      "yOriginPercentage": -33,
+      "yOriginPercentage": 0,
+      "width": 1,
+      "height": 2,
       "additionalProperties": {
         "capacity": {
           "value": 1,

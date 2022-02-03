@@ -398,7 +398,9 @@ namespace Others.Managers
     {
       var kyle = AddVillager("Kyle", new Point(0, 0), new Dictionary<string, float>() { { "mining", 1 }, { "chopping", 1 }, { "crafting", 1 }, { "gathering", 1 } });
 
-      var umneyHousehold = AddHousehold("Umney", new Rectangle(11, 3, 5, 5));
+      var umneyHousehold = AddHousehold("Umney", new Rectangle(5, 3, 5, 5));
+      AddPlace("storageChest", 8, 4);
+      AddPlace("singleBed", 6, 4);
       umneyHousehold.AssignVillager(kyle);
       //AddVillager("Niall", new Dictionary<string, float>() { { "chopping", 1 } });
 
@@ -429,10 +431,6 @@ namespace Others.Managers
       //{
       //  AddTask("choppingNormalTree", 1, place.Id);
       //}
-
-      AddPlace("storageChest", 5, 5);
-      AddPlace("singleBed", 6, 5);
-      AddPlace("singleBed", 8, 5);
     }
 
     /// <summary>

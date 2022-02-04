@@ -195,6 +195,8 @@ namespace Others.Managers
         Name = name,
       };
 
+      var points = new List<Point>();
+
       for (int y = size.Y; y < size.Bottom; y++)
       {
         for (int x = size.X; x < size.Right; x++)
@@ -209,26 +211,17 @@ namespace Others.Managers
           if (addDoor)
             AddPlace("woodenDoor", x, y);
           else if (addWall)
-          {
-            bool hasLeft = x > size.X;
-            bool hasRight = x < (size.Right - 1);
-            bool hasTop = y > size.Y;
-            bool hasBottom = y < (size.Bottom - 1);
-
-            var wallType = "bottom";
-
-            if (hasTop && hasBottom)
-              wallType = "middle";
-            else if (!hasTop && hasBottom)
-              wallType = "top";
-            else if (hasTop && !hasBottom)
-              wallType = "bottom";
-
-            AddPlace("woodenWall", x, y, new Dictionary<string, string>() { { "wallType", wallType } });
-          }
+            points.Add(new Point(x, y));
           else
             AddPlace("woodenFloor", x, y);
         }
+      }
+
+      foreach (var wall in points)
+      {
+        string wallType = GetWallType(wall, points);
+
+        AddPlace("woodenWall", wall.X, wall.Y, new Dictionary<string, string>() { { "wallType", wallType } });
       }
 
       GameWorld.Households.Add(household);
@@ -236,17 +229,71 @@ namespace Others.Managers
       return household;
     }
 
-    private string GetWallType(bool hasLeft, bool hasRight, bool hasTop, bool hasBottom)
+    private static string GetWallType(Point wall, List<Point> points)
     {
-      string result = "";
+      var x = wall.X;
+      var y = wall.Y;
+      var hasLeft = points.Contains(new Point(x - 1, y));
+      var hasRight = points.Contains(new Point(x + 1, y));
+      var hasTop = points.Contains(new Point(x, y - 1));
+      var hasBottom = points.Contains(new Point(x, y + 1));
 
-      if(hasTop)
+      var wallType = "";
+      if (hasTop)
+        wallType += "D";
+
+      if (hasRight)
+        wallType += "R";
+
+      if (hasBottom)
+        wallType += "U";
+
+      if (hasLeft)
+        wallType += "L";
+
+      if (string.IsNullOrEmpty(wallType))
+        wallType = "Wall";
+
+      return wallType;
+    }
+
+    public void TestWalls(int startX, int startY)
+    {
+      var points = new List<Point>();
+
+      var map = new int[,]
       {
+        { 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, },
+        { 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, },
+        { 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, },
+        { 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, },
+        { 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, },
+        { 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, },
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, },
+        { 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, },
+        { 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, },
+        { 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, },
+        { 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+      };
 
+      for (int y = 0; y < map.GetLength(0); y++)
+      {
+        for (int x = 0; x < map.GetLength(1); x++)
+        {
+          if (map[y, x] == 1)
+          {
+            points.Add(new Point(x, y));
+          }
+        }
       }
 
+      foreach(var wall in points)
+      {
+        string wallType = GetWallType(wall, points);
 
-      return result;
+        AddPlace("woodenWall", wall.X + startX, wall.Y + startY, new Dictionary<string, string>() { { "wallType", wallType } });
+      }
     }
 
     public Villager AddVillager(string name, Point mapPoint, Dictionary<string, float> skills = null)
@@ -432,6 +479,8 @@ namespace Others.Managers
       AddPlace("singleBed", 6, 4);
       umneyHousehold.AssignVillager(kyle);
       //AddVillager("Niall", new Dictionary<string, float>() { { "chopping", 1 } });
+
+      //TestWalls(12, 2);
 
       AddPlace("goldOre", 1, 1);
       //AddPlace("goldOre", 2, 1);

@@ -21,7 +21,7 @@ namespace Others.Controls
 
     public float LayerOffset { get; set; }
 
-    public bool IsVisible { get; set; } = false;
+    public bool IsVisible { get; set; } = true;
 
     public bool IsDrawingVisible { get; private set; }
 
@@ -103,8 +103,6 @@ namespace Others.Controls
     public Action OnClicked { get; set; } = null;
 
     public Action<Control> OnAddChild { get; set; } = null;
-
-    public Func<bool> GetVisibility = null;
 
     public bool IsClickable
     {
@@ -195,7 +193,12 @@ namespace Others.Controls
     protected void UpdateChildren(GameTime gameTime)
     {
       foreach (var child in Children)
+      {
+        if (!child.IsVisible)
+          continue;
+
         child.Update(gameTime);
+      }
     }
 
     public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -206,7 +209,12 @@ namespace Others.Controls
     protected void DrawChildren(GameTime gameTime, SpriteBatch spriteBatch)
     {
       foreach (var child in Children)
+      {
+        if (!child.IsVisible)
+          continue;
+
         child.Draw(gameTime, spriteBatch);
+      }
     }
 
     public void AddTag(string value)

@@ -36,6 +36,7 @@ namespace Others.Controls
       {
         _label = new Label(font, text)
         {
+          IsVisible = true,
           Position = new Vector2((_texture.Width / 2) - (font.MeasureString(text).X / 2), (_texture.Height / 2) - (font.MeasureString(text).Y / 2)),
         };
 
@@ -47,6 +48,14 @@ namespace Others.Controls
     {
       spriteBatch.Draw(_texture, DrawPosition, null, IsMouseOver ? HoverColour : Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, DrawLayer);
       DrawChildren(gameTime, spriteBatch);
+    }
+
+    public override string ToString()
+    {
+      if (!string.IsNullOrEmpty(Text))
+        return $"{Text} button";
+
+      return base.ToString();
     }
   }
 }

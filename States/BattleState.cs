@@ -22,6 +22,12 @@ namespace Others.States
 {
   public class BattleState : State
   {
+    public enum States
+    {
+      Playing,
+      Building,
+    }
+
     private Viewport _viewport;
 
     public Map Map { get; private set; }
@@ -29,6 +35,8 @@ namespace Others.States
     private List<Entity> _entities = new List<Entity>();
 
     private GameWorldManager _gwm;
+
+    public HouseBuildingManager _hbm;
 
     public bool ShowGrid { get; private set; } = false;
 
@@ -42,11 +50,16 @@ namespace Others.States
 
     public Pathfinder Pathfinder { get; private set; }
 
+
+    public States State { get; private set; } = States.Playing;
+
     #region GUI Stuff
-    public GUI.Panel Panel;
-    public GUI.CraftingDetails.Panel CraftingPanel;
+    //public GUI.Panel Panel;
+    //public GUI.CraftingDetails.Panel CraftingPanel;
 
     private List<Control> _controls;
+
+    private List<Control> _buildingControls;
     #endregion
 
     public BattleState(GameModel gameModel)
@@ -65,18 +78,22 @@ namespace Others.States
       _gwm = new GameWorldManager(this);
       _gwm.Load("save.json");
 
+      _hbm = new HouseBuildingManager(_content);
+
       PathManager = new PathManager(Map);
       PathManager.LoadContent(_content);
 
       #region GUI Stuff
-      Panel = new GUI.Panel(_content);
-      CraftingPanel = new GUI.CraftingDetails.Panel(_content);
 
       _controls = new List<Control>()
       {
         GetControlsPanel(),
-        GetCraftingPanel(),
-        GetBuildingPanel(),
+        GetBuildingItemsPanel(),
+      };
+
+      _buildingControls = new List<Control>()
+      {
+        GetBuildingItemsPanel(),
       };
       #endregion
     }
@@ -91,22 +108,36 @@ namespace Others.States
       panelTexture.SetData(Helpers.GetBorder(panelTexture.Width, panelTexture.Height, 2, Color.Black, Color.White));
 
       var panel = new Panel(panelTexture, new Vector2(0, ZonerGame.ScreenHeight - panelTexture.Height));
-      panel.IsVisible = true;
+      panel.AddTag("Playing");
 
       var buttonTexture = new Texture2D(GameModel.GraphicsDevice, 100, panelTexture.Height - 10);
       buttonTexture.SetData(Helpers.GetBorder(buttonTexture.Width, buttonTexture.Height, 2, Color.Black, Color.Gray));
       var font = _content.Load<SpriteFont>("Font");
 
-      panel.AddChild(new Button(buttonTexture, font, "Build") { OnClicked = () => SetMainVisibility((Panel)_controls.FirstOrDefault(c => c.HasTag("Building"))) });
-      panel.AddChild(new Button(buttonTexture, font, "Furniture") { OnClicked = () => SetMainVisibility((Panel)_controls.FirstOrDefault(c => c.HasTag("Furniture"))) });
-      panel.AddChild(new Button(buttonTexture, font, "Craft") { OnClicked = () => SetMainVisibility((Panel)_controls.FirstOrDefault(c => c.HasTag("Crafting"))) });
-      panel.AddChild(new Button(buttonTexture, font, "Tasks") { OnClicked = () => SetMainVisibility((Panel)_controls.FirstOrDefault(c => c.HasTag("Tasks"))) });
+      panel.AddChild(new Button(buttonTexture, font, "Build") { OnClicked = () => SetMainVisibility((Panel)panel.Children.FirstOrDefault(c => c.HasTag("Building"))) });
+      panel.AddChild(new Button(buttonTexture, font, "Furniture") { OnClicked = () => SetMainVisibility((Panel)panel.Children.FirstOrDefault(c => c.HasTag("Furniture"))) });
+      panel.AddChild(new Button(buttonTexture, font, "Craft") { OnClicked = () => SetMainVisibility((Panel)panel.Children.FirstOrDefault(c => c.HasTag("Crafting"))) });
+      panel.AddChild(new Button(buttonTexture, font, "Tasks") { OnClicked = () => SetMainVisibility((Panel)panel.Children.FirstOrDefault(c => c.HasTag("Tasks"))) });
 
       var x = 5f;
       foreach (var control in panel.Children)
       {
+        control.IsVisible = true;
         control.Position = new Vector2(x, 5);
         x += buttonTexture.Width + 5;
+      }
+
+      var subMenu = new List<Control>()
+      {
+        GetCraftingPanel(),
+        GetBuildingPanel(),
+      };
+
+      foreach (var control in subMenu)
+      {
+        control.Position = new Vector2(0, -control.Rectangle.Height);
+        control.IsVisible = false;
+        panel.AddChild(control);
       }
 
       return panel;
@@ -159,8 +190,6 @@ namespace Others.States
       panel.AddTag("Main");
       panel.AddTag("Crafting");
 
-      panel.GetVisibility = () => GetVisibility(panel, Keys.C);
-
       return panel;
     }
 
@@ -210,8 +239,6 @@ namespace Others.States
       panel.AddTag("Main");
       panel.AddTag("Crafting");
 
-      panel.GetVisibility = () => GetVisibility(panel, Keys.C);
-
       return panel;
     }
 
@@ -224,11 +251,25 @@ namespace Others.States
 
       var panel = new Panel(panelTexture, new Vector2(0, (ZonerGame.ScreenHeight - 100) - panelTexture.Height));
       panel.AddChild(new Label(font, "Building") { Position = new Vector2(10, 20) });
-      panel.AddChild(new Button(buttonTexture, font, "Build House") { Position = new Vector2(10, 40) });
+      panel.AddChild(new Button(buttonTexture, font, "Build House") { Position = new Vector2(10, 40), OnClicked = () => { State = States.Building; _hbm.Start(); } });
       panel.AddTag("Main");
       panel.AddTag("Building");
 
-      panel.GetVisibility = () => GetVisibility(panel, Keys.B);
+      return panel;
+    }
+
+    /// <summary>
+    /// The panel that shows up once we're in building mode
+    /// </summary>
+    /// <returns></returns>
+    private Control GetBuildingItemsPanel()
+    {
+      var panelTexture = new Texture2D(GameModel.GraphicsDevice, 300, 150);
+      panelTexture.SetData(Helpers.GetBorder(panelTexture.Width, panelTexture.Height, 2, Color.Black, Color.White));
+
+      var panel = new Panel(panelTexture, new Vector2(0, ZonerGame.ScreenHeight - panelTexture.Height));
+      panel.AddTag("Building");
+      panel.IsVisible = false;
 
       return panel;
     }
@@ -252,7 +293,7 @@ namespace Others.States
 
       if (panel.IsVisible)
       {
-        foreach (var p in _controls.Where(c => c.HasTag("Main")))
+        foreach (var p in panel.Parent.Children.Where(c => c.HasTag("Main")))
         {
           p.IsVisible = false;
         }
@@ -335,26 +376,20 @@ namespace Others.States
       if (GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.S))
         _gwm.Save("save.json");
 
-      _gwm.Update(gameTime);
-
       foreach (var control in _controls)
       {
-        // TODO: Sort out this mess
-        if (control.GetVisibility != null)
-          control.IsVisible = control.GetVisibility();
-
-        if (!control.IsVisible)
+        if (!control.HasTag(State.ToString()))
           continue;
 
         control.Update(gameTime);
       }
 
-      //PathManager.Update(gameTime);
+      _gwm.Update(gameTime);
+      _hbm.Update(gameTime);
 
       foreach (var entity in _entities)
         entity.Update(gameTime, _entities);
 
-      Panel.Clear();
       for (int i = 0; i < _entities.Count; i++)
       {
         var entity = _entities[i];
@@ -375,25 +410,6 @@ namespace Others.States
           _entities.RemoveAt(i);
           i--;
         }
-        else
-        {
-          var selectedComponent = entity.GetComponent<SelectableComponent>();
-          if (selectedComponent != null)
-          {
-            if (selectedComponent.IsSelected)
-            {
-              Panel.Clear();
-              if (selectedComponent.Information != null)
-              {
-                Panel.SetMainHeader(selectedComponent.Information.Header);
-                foreach (var info in selectedComponent.Information.Sections)
-                {
-                  Panel.AddSection(info.Header, info.Values);
-                }
-              }
-            }
-          }
-        }
       }
     }
 
@@ -407,10 +423,16 @@ namespace Others.States
 
       _spriteBatch.End();
 
+      _hbm.Draw(gameTime, _spriteBatch);
 
+      DrawGUI(gameTime);
+    }
+
+    private void DrawGUI(GameTime gameTime)
+    {
       foreach (var control in _controls.Where(c => c.HasViewport))
       {
-        if (!control.IsVisible)
+        if (!control.HasTag(State.ToString()))
           continue;
 
         //_spriteBatch.Begin(SpriteSortMode.FrontToBack, transformMatrix: control.ViewMatrix);
@@ -424,14 +446,12 @@ namespace Others.States
       _spriteBatch.Begin(SpriteSortMode.FrontToBack);
       foreach (var control in _controls.Where(c => !c.HasViewport))
       {
-        if (!control.IsVisible)
+        if (!control.HasTag(State.ToString()))
           continue;
 
         GameModel.GraphicsDevice.Viewport = _viewport;
         control.Draw(gameTime, _spriteBatch);
       }
-
-      Panel.Draw(_spriteBatch, gameTime);
 
       _spriteBatch.End();
     }

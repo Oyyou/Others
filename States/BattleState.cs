@@ -30,6 +30,10 @@ namespace Others.States
 
     private Viewport _viewport;
 
+    private Matrix _camera = Matrix.CreateTranslation(0, 0, 0);
+
+    public float _scale = 1f;
+
     public Map Map { get; private set; }
 
     private List<Entity> _entities = new List<Entity>();
@@ -52,6 +56,11 @@ namespace Others.States
 
 
     public States State { get; private set; } = States.Playing;
+
+    #region Input Stuff
+    private float _previousScroll;
+    private float _currentScroll;
+    #endregion
 
     #region GUI Stuff
     //public GUI.Panel Panel;
@@ -78,7 +87,7 @@ namespace Others.States
       _gwm = new GameWorldManager(this);
       _gwm.Load("save.json");
 
-      _hbm = new HouseBuildingManager(_content, Map)
+      _hbm = new HouseBuildingManager(_content, Map, _camera)
       {
         OnCancel = () => State = States.Playing,
         OnFinish = (Rectangle rectangle) => _gwm.AddHousehold("New", new Rectangle(rectangle.X / Game1.TileSize, rectangle.Y / Game1.TileSize, rectangle.Width / Game1.TileSize, rectangle.Height / Game1.TileSize)),
@@ -368,6 +377,22 @@ namespace Others.States
 
     public override void Update(GameTime gameTime)
     {
+      _previousScroll = _currentScroll;
+      _currentScroll = GameMouse.ScrollWheelValue;
+
+      if (_currentScroll < _previousScroll)
+      {
+        _scale -= 0.01f;
+      }
+      else if (_currentScroll > _previousScroll)
+      {
+        _scale += 0.01f;
+
+      }
+
+      _scale = MathHelper.Clamp(_scale, 0.5f, 1f);
+      _camera = Matrix.CreateTranslation(0, 0, 0) * Matrix.CreateScale(_scale);
+
       if (GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.G))
         ShowGrid = !ShowGrid;
 
@@ -420,14 +445,14 @@ namespace Others.States
     public override void Draw(GameTime gameTime)
     {
       GameModel.GraphicsDevice.Viewport = _viewport;
-      _spriteBatch.Begin(SpriteSortMode.FrontToBack);
+      _spriteBatch.Begin(SpriteSortMode.FrontToBack, transformMatrix: _camera);
 
       foreach (var entity in _entities)
         entity.Draw(gameTime, _spriteBatch);
 
       _spriteBatch.End();
 
-      _hbm.Draw(gameTime, _spriteBatch);
+      _hbm.Draw(gameTime, _spriteBatch, _camera);
 
       DrawGUI(gameTime);
     }

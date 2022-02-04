@@ -15,6 +15,7 @@ namespace Others.Managers
   public class HouseBuildingManager
   {
     private Map _map;
+    private Matrix _camera;
 
     private Texture2D _texture;
     private List<Entity> _entities = new List<Entity>();
@@ -31,9 +32,10 @@ namespace Others.Managers
 
     public Action<Rectangle> OnFinish;
 
-    public HouseBuildingManager(ContentManager content, Map map)
+    public HouseBuildingManager(ContentManager content, Map map, Matrix camera)
     {
       _map = map;
+      _camera = camera;
       _texture = content.Load<Texture2D>("GUI/Drawer");
     }
 
@@ -183,12 +185,12 @@ namespace Others.Managers
         entity.Update(gameTime, _entities);
     }
 
-    public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+    public void Draw(GameTime gameTime, SpriteBatch spriteBatch, Matrix camera)
     {
       if (!_isVisible)
         return;
 
-      spriteBatch.Begin();
+      spriteBatch.Begin(transformMatrix: camera);
 
       _cursorEntity.Draw(gameTime, spriteBatch);
 

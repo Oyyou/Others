@@ -78,7 +78,7 @@ namespace Others.States
       _gwm = new GameWorldManager(this);
       _gwm.Load("save.json");
 
-      _hbm = new HouseBuildingManager(_content);
+      _hbm = new HouseBuildingManager(_content, Map);
 
       PathManager = new PathManager(Map);
       PathManager.LoadContent(_content);

@@ -10,14 +10,47 @@ namespace Others.Entities
 {
   public class DrawingSquare : Entity
   {
+    // Forgive my naming
+    public enum States
+    {
+      Cursor,
+      TooSmall,
+      Colliding,
+      Fine,
+    }
+
     private Texture2D _texture;
 
-    private Color _colour;
+    private Color _colour
+    {
+      get
+      {
+        switch (State)
+        {
+          case States.Cursor:
+            return Color.Blue;
 
-    public DrawingSquare(Texture2D texture, Color colour)
+          case States.TooSmall:
+            return Color.Yellow;
+
+          case States.Colliding:
+            return Color.Red;
+
+          case States.Fine:
+            return Color.Green;
+
+          default:
+            return Color.Green;
+        }
+      }
+    }
+
+    public readonly States State;
+
+    public DrawingSquare(Texture2D texture, States state)
     {
       _texture = texture;
-      _colour = colour;
+      State = state;
     }
 
     public override void LoadContent()

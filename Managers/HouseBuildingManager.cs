@@ -27,6 +27,10 @@ namespace Others.Managers
     private Rectangle _currentRectangle;
     private Rectangle _previousRectangle;
 
+    public Action OnCancel;
+
+    public Action<Rectangle> OnFinish;
+
     public HouseBuildingManager(ContentManager content, Map map)
     {
       _map = map;
@@ -47,10 +51,38 @@ namespace Others.Managers
       _startPosition = null;
     }
 
+    public void Cancel()
+    {
+      _startPosition = null;
+      _isVisible = false;
+      _entities.Clear();
+      OnCancel?.Invoke();
+    }
+
+    public void Finish()
+    {
+      if(_entities.Count > 0)
+      {
+        OnFinish?.Invoke(_currentRectangle);
+      }
+
+      Cancel();
+    }
+
     public void Update(GameTime gameTime)
     {
       if (!_isVisible)
         return;
+
+      if(GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Escape))
+      {
+        Cancel();
+      }
+
+      if(GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Enter))
+      {
+        Finish();
+      }
 
       var mousePosition = new Point((int)Math.Floor(GameMouse.Position.X / (double)Game1.TileSize) * Game1.TileSize, (int)Math.Floor(GameMouse.Position.Y / (double)Game1.TileSize) * Game1.TileSize).ToVector2();
       _cursorEntity.Position = mousePosition;

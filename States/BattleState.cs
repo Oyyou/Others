@@ -78,7 +78,11 @@ namespace Others.States
       _gwm = new GameWorldManager(this);
       _gwm.Load("save.json");
 
-      _hbm = new HouseBuildingManager(_content, Map);
+      _hbm = new HouseBuildingManager(_content, Map)
+      {
+        OnCancel = () => State = States.Playing,
+        OnFinish = (Rectangle rectangle) => _gwm.AddHousehold("New", new Rectangle(rectangle.X / Game1.TileSize, rectangle.Y / Game1.TileSize, rectangle.Width / Game1.TileSize, rectangle.Height / Game1.TileSize)),
+      };
 
       PathManager = new PathManager(Map);
       PathManager.LoadContent(_content);

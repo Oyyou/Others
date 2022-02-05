@@ -229,6 +229,35 @@ namespace Others.Managers
       return household;
     }
 
+    public Household AddHousehold(string name, Building building)
+    {
+      var household = new Household()
+      {
+        Id = GetId("household"),
+        Name = name,
+      };
+
+      var size = building.Rectangle.Divide(Game1.TileSize);
+
+      for (int y = size.Y; y < size.Bottom; y++)
+      {
+        for (int x = size.X; x < size.Right; x++)
+        {
+          var point = new Point(x, y);
+
+          if (building.Doors.ContainsKey(point))
+            AddPlace("woodenDoor", x, y);
+          else if (building.Walls.ContainsKey(point))
+            AddPlace("woodenWall", x, y, new Dictionary<string, string>() { { "wallType", Path.GetFileName(building.Walls[point].TextureName) } });
+          else
+            AddPlace("woodenFloor", x, y);
+        }
+      }
+
+      GameWorld.Households.Add(household);
+      return household;
+    }
+
     private static string GetWallType(Point wall, List<Point> points)
     {
       var x = wall.X;
@@ -255,6 +284,97 @@ namespace Others.Managers
         wallType = "Wall";
 
       return wallType;
+    }
+
+    public static Dictionary<Point, string> GetOuterWalls(Rectangle rectangle)
+    {
+      var points = new List<Point>();
+
+      for (int y = rectangle.Y; y < rectangle.Bottom; y++)
+      {
+        for (int x = rectangle.X; x < rectangle.Right; x++)
+        {
+          var addWall = y == rectangle.Y ||
+            x == rectangle.X ||
+            y == (rectangle.Bottom - 1) ||
+            x == (rectangle.Right - 1);
+
+          if (addWall)
+            points.Add(new Point(x, y));
+        }
+      }
+
+      var result = new Dictionary<Point, string>();
+      foreach (var wall in points)
+      {
+        var x = wall.X;
+        var y = wall.Y;
+        var hasLeft = points.Contains(new Point(x - 1, y));
+        var hasRight = points.Contains(new Point(x + 1, y));
+        var hasTop = points.Contains(new Point(x, y - 1));
+        var hasBottom = points.Contains(new Point(x, y + 1));
+
+        var wallType = "";
+        if (hasTop)
+          wallType += "D";
+
+        if (hasRight)
+          wallType += "R";
+
+        if (hasBottom)
+          wallType += "U";
+
+        if (hasLeft)
+          wallType += "L";
+
+        if (string.IsNullOrEmpty(wallType))
+          wallType = "Wall";
+
+        result.Add(wall, wallType);
+      }
+
+      return result;
+    }
+
+    public static Dictionary<Point, string> GetWalls(List<Rectangle> rectangles)
+    {
+      var points = new List<Point>();
+
+      foreach (var rectangle in rectangles)
+      {
+        points.Add(new Point(rectangle.X, rectangle.Y));
+      }
+
+      var result = new Dictionary<Point, string>();
+      foreach (var wall in points)
+      {
+        var x = wall.X;
+        var y = wall.Y;
+        var hasLeft = points.Contains(new Point(x - 1, y));
+        var hasRight = points.Contains(new Point(x + 1, y));
+        var hasTop = points.Contains(new Point(x, y - 1));
+        var hasBottom = points.Contains(new Point(x, y + 1));
+
+        var wallType = "";
+        if (hasTop)
+          wallType += "D";
+
+        if (hasRight)
+          wallType += "R";
+
+        if (hasBottom)
+          wallType += "U";
+
+        if (hasLeft)
+          wallType += "L";
+
+        if (string.IsNullOrEmpty(wallType))
+          wallType = "Wall";
+
+        result.Add(wall, wallType);
+      }
+
+      return result;
     }
 
     public void TestWalls(int startX, int startY)
@@ -288,7 +408,7 @@ namespace Others.Managers
         }
       }
 
-      foreach(var wall in points)
+      foreach (var wall in points)
       {
         string wallType = GetWallType(wall, points);
 

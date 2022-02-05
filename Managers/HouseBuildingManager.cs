@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Others.Controls;
 using Others.Entities;
+using Others.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,12 +26,17 @@ namespace Others.Managers
       AddingFurniture
     }
 
+    private GameModel _gameModel;
     private Map _map;
     private Matrix _camera;
 
     private Texture2D _texture;
     private List<Entity> _entities = new List<Entity>();
     private Entity _cursorEntity;
+
+    #region Adding internal walls
+    private Building _building;
+    #endregion
 
     private bool _isVisible = false;
 
@@ -49,15 +55,18 @@ namespace Others.Managers
 
     public Action OnCancel;
 
-    public Action<Rectangle> OnFinish;
+    public Action<Building> OnFinish;
 
     public States State { get; private set; } = States.LayingFoundation;
 
     public HouseBuildingManager(GameModel gameModel, Map map, Matrix camera)
     {
+      _gameModel = gameModel;
       _map = map;
       _camera = camera;
-      _texture = gameModel.Content.Load<Texture2D>("GUI/Drawer");
+      _texture = _gameModel.Content.Load<Texture2D>("GUI/Drawer");
+
+      _building = new Building();
 
       InitializeGUI(gameModel);
     }
@@ -89,6 +98,10 @@ namespace Others.Managers
             case States.AddingDoors:
               State = States.AddingInternalWalls;
               _nextButton.SetText("Next");
+              foreach (var wall in _building.Walls)
+                wall.Value.HasDoor = false;
+
+              UpdateWallTextures();
               break;
             case States.AddingFurniture:
               State = States.AddingDoors;
@@ -106,12 +119,35 @@ namespace Others.Managers
           switch (State)
           {
             case States.LayingFoundation:
-              State = States.AddingInternalWalls;
-              _prevButton.SetText("Prev");
+              if (_entities.Count > 0 && _entities.All(c => ((DrawingSquare)c).State == DrawingSquare.States.Fine))
+              {
+                State = States.AddingInternalWalls;
+                _prevButton.SetText("Prev");
+                var walls = GameWorldManager.GetOuterWalls(_currentRectangle.Divide(40));
+                _building.Walls = new Dictionary<Point, Wall>();
+                _building.Doors = new Dictionary<Point, Basic>();
+                _building.Rectangle = _currentRectangle;
+                foreach (var wall in walls)
+                {
+                  var wallEntity = new Wall(_gameModel.Content.Load<Texture2D>($"Places/Walls/{wall.Value}"), wall.Key.Multiply(Game1.TileSize).ToVector2(), Wall.Types.External);
+                  wallEntity.LoadContent();
+                  _building.Walls.Add(wall.Key, wallEntity);
+                }
+              }
               break;
             case States.AddingInternalWalls:
               State = States.AddingDoors;
               _prevButton.SetText("Prev");
+
+
+              foreach (var door in _building.Doors)
+              {
+                var wall = _building.Walls.FirstOrDefault(c => c.Value.Position == door.Value.Position);
+                wall.Value.HasDoor = true;
+              }
+
+              UpdateWallTextures();
+
               break;
             case States.AddingDoors:
               State = States.AddingFurniture;
@@ -162,6 +198,32 @@ namespace Others.Managers
       _title.UpdatePosition(new Rectangle(0, 0, ZonerGame.ScreenWidth, 40));
     }
 
+    private void UpdateCursor()
+    {
+      var position = _cursorEntity.Position;
+      switch (State)
+      {
+        case States.LayingFoundation:
+          _cursorEntity = new DrawingSquare(_texture, DrawingSquare.States.Cursor);
+          _cursorEntity.LoadContent();
+          break;
+        case States.AddingInternalWalls:
+          _cursorEntity = new DrawingSquare(_gameModel.Content.Load<Texture2D>($"Places/Walls/Wall"), DrawingSquare.States.Cursor);
+          _cursorEntity.LoadContent();
+          break;
+        case States.AddingDoors:
+          _cursorEntity = new DrawingSquare(_gameModel.Content.Load<Texture2D>($"Places/woodenDoor"), DrawingSquare.States.Cursor);
+          _cursorEntity.LoadContent();
+          break;
+        case States.AddingFurniture:
+          break;
+        default:
+          break;
+      }
+
+      _cursorEntity.Position = position;
+    }
+
     public void Start()
     {
       State = States.LayingFoundation;
@@ -187,9 +249,9 @@ namespace Others.Managers
 
     public void Finish()
     {
-      if (_entities.Count > 0)
+      if (_building.Doors.Count > 0 && _building.Walls.Count > 0)
       {
-        OnFinish?.Invoke(_currentRectangle);
+        OnFinish?.Invoke(_building);
       }
 
       Cancel();
@@ -218,15 +280,20 @@ namespace Others.Managers
         control.Update(gameTime);
 
       UpdateTitle();
+      UpdateCursor();
 
-      LayingFoundationUpdate();
+      LayingFoundationUpdate(gameTime);
 
-      _cursorEntity.Update(gameTime, _entities);
+      AddingInternalWalls(gameTime);
+
+      AddingDoors(gameTime);
+
+      _cursorEntity.Update(gameTime);
       foreach (var entity in _entities)
-        entity.Update(gameTime, _entities);
+        entity.Update(gameTime);
     }
 
-    private void LayingFoundationUpdate()
+    private void LayingFoundationUpdate(GameTime gameTime)
     {
       if (State != States.LayingFoundation)
         return;
@@ -328,6 +395,101 @@ namespace Others.Managers
       }
     }
 
+    private void AddingInternalWalls(GameTime gameTime)
+    {
+      if (State != States.AddingInternalWalls)
+        return;
+
+      foreach (var wall in _building.Walls)
+        wall.Value.Update(gameTime);
+
+      if (!GameMouse.Intersects(_currentRectangle))
+        return;
+
+      if (GameMouse.IsLeftPressed)
+      {
+        if (_building.Walls.Any(c => c.Value.Position == _cursorEntity.Position))
+          return;
+
+        var wallEntity = new Wall(_gameModel.Content.Load<Texture2D>($"Places/Walls/Wall"), _cursorEntity.Position, Wall.Types.Interal);
+        wallEntity.LoadContent();
+        _building.Walls.Add(wallEntity.Point, wallEntity);
+
+        var newPoints = GameWorldManager.GetWalls(_building.Walls.Select(c => c.Value.Rectangle.Divide(40)).ToList());
+        foreach (var wall in _building.Walls)
+        {
+          wall.Value.ChangeTexture(_gameModel.Content.Load<Texture2D>($"Places/Walls/{newPoints[wall.Value.Point]}"));
+        }
+      }
+      else if (GameMouse.IsRightPressed)
+      {
+        var wall = _building.Walls.Where(c => c.Value.Type == Wall.Types.Interal).FirstOrDefault(c => c.Value.Position == _cursorEntity.Position);
+        _building.Walls.Remove(wall.Key);
+
+        UpdateWallTextures();
+      }
+    }
+
+    private void UpdateWallTextures()
+    {
+      var walls = _building.Walls.Where(c => !c.Value.HasDoor);
+      var newPoints = GameWorldManager.GetWalls(walls.Select(c => c.Value.Rectangle.Divide(40)).ToList());
+      foreach (var w in walls)
+      {
+        w.Value.ChangeTexture(_gameModel.Content.Load<Texture2D>($"Places/Walls/{newPoints[w.Value.Point]}"));
+      }
+    }
+
+    private void AddingDoors(GameTime gameTime)
+    {
+      if (State != States.AddingDoors)
+        return;
+
+      foreach (var wall in _building.Walls)
+        wall.Value.Update(gameTime);
+
+      foreach (var door in _building.Doors)
+        door.Value.Update(gameTime);
+
+      if (!GameMouse.Intersects(_currentRectangle))
+        return;
+
+      if (GameMouse.IsLeftClicked)
+      {
+
+        var key = (_cursorEntity.Position / 40).ToPoint();
+        if (!_building.Walls.ContainsKey(key))
+          return;
+
+        var wall = _building.Walls[key];
+
+        wall.HasDoor = true;
+
+        var door = new Basic(_gameModel.Content.Load<Texture2D>($"Places/woodenDoor"), wall.Position);
+        door.LoadContent();
+
+        _building.Doors.Add(key, door);
+        UpdateWallTextures();
+      }
+      else if (GameMouse.IsRightClicked)
+      {
+        var key = (_cursorEntity.Position / 40).ToPoint();
+        if (!_building.Walls.ContainsKey(key))
+          return;
+
+        var wall = _building.Walls[key];
+
+        if (!_building.Doors.ContainsKey(key))
+          return;
+
+        var door = _building.Walls[key];
+
+        wall.HasDoor = false;
+        _building.Doors.Remove(key);
+        UpdateWallTextures();
+      }
+    }
+
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch, Matrix camera)
     {
       if (!_isVisible)
@@ -335,10 +497,22 @@ namespace Others.Managers
 
       spriteBatch.Begin(transformMatrix: camera);
 
-      _cursorEntity.Draw(gameTime, spriteBatch);
-
       foreach (var entity in _entities)
         entity.Draw(gameTime, spriteBatch);
+
+      if (State > States.LayingFoundation)
+      {
+        foreach (var entity in _building.Walls)
+          entity.Value.Draw(gameTime, spriteBatch);
+      }
+
+      if (State > States.AddingInternalWalls)
+      {
+        foreach (var door in _building.Doors)
+          door.Value.Draw(gameTime, spriteBatch);
+      }
+
+      _cursorEntity.Draw(gameTime, spriteBatch);
 
       spriteBatch.End();
 

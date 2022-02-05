@@ -90,7 +90,7 @@ namespace Others.States
       _hbm = new HouseBuildingManager(GameModel, Map, _camera)
       {
         OnCancel = () => State = States.Playing,
-        OnFinish = (Rectangle rectangle) => _gwm.AddHousehold("New", new Rectangle(rectangle.X / Game1.TileSize, rectangle.Y / Game1.TileSize, rectangle.Width / Game1.TileSize, rectangle.Height / Game1.TileSize)),
+        OnFinish = (Models.Building building) => _gwm.AddHousehold("New", building),
       };
 
       PathManager = new PathManager(Map);
@@ -417,7 +417,7 @@ namespace Others.States
       _hbm.Update(gameTime);
 
       foreach (var entity in _entities)
-        entity.Update(gameTime, _entities);
+        entity.Update(gameTime);
 
       for (int i = 0; i < _entities.Count; i++)
       {

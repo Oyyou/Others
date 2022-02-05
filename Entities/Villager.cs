@@ -105,7 +105,7 @@ namespace Others.Entities
       });
     }
 
-    public void Move(GameTime gameTime, List<Entity> entities)
+    public void Move(GameTime gameTime)
     {
       Position = Wrapper.Position;
       _rectangle.X = (int)Position.X;

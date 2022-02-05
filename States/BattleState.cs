@@ -90,7 +90,7 @@ namespace Others.States
       _hbm = new HouseBuildingManager(GameModel, Map, _camera)
       {
         OnCancel = () => State = States.Playing,
-        OnFinish = (Models.Building building) => _gwm.AddHousehold("New", building),
+        OnFinish = (Models.Building building) => _gwm.AddHousehold("", building),
       };
 
       PathManager = new PathManager(Map);

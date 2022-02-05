@@ -87,7 +87,7 @@ namespace Others.States
       _gwm = new GameWorldManager(this);
       _gwm.Load("save.json");
 
-      _hbm = new HouseBuildingManager(_content, Map, _camera)
+      _hbm = new HouseBuildingManager(GameModel, Map, _camera)
       {
         OnCancel = () => State = States.Playing,
         OnFinish = (Rectangle rectangle) => _gwm.AddHousehold("New", new Rectangle(rectangle.X / Game1.TileSize, rectangle.Y / Game1.TileSize, rectangle.Width / Game1.TileSize, rectangle.Height / Game1.TileSize)),
@@ -127,10 +127,10 @@ namespace Others.States
       buttonTexture.SetData(Helpers.GetBorder(buttonTexture.Width, buttonTexture.Height, 2, Color.Black, Color.Gray));
       var font = _content.Load<SpriteFont>("Font");
 
-      panel.AddChild(new Button(buttonTexture, font, "Build") { OnClicked = () => SetMainVisibility((Panel)panel.Children.FirstOrDefault(c => c.HasTag("Building"))) });
-      panel.AddChild(new Button(buttonTexture, font, "Furniture") { OnClicked = () => SetMainVisibility((Panel)panel.Children.FirstOrDefault(c => c.HasTag("Furniture"))) });
-      panel.AddChild(new Button(buttonTexture, font, "Craft") { OnClicked = () => SetMainVisibility((Panel)panel.Children.FirstOrDefault(c => c.HasTag("Crafting"))) });
-      panel.AddChild(new Button(buttonTexture, font, "Tasks") { OnClicked = () => SetMainVisibility((Panel)panel.Children.FirstOrDefault(c => c.HasTag("Tasks"))) });
+      panel.AddChild(new Button(buttonTexture, font, "Build") { OnClicked = (self) => SetMainVisibility((Panel)panel.Children.FirstOrDefault(c => c.HasTag("Building"))) });
+      panel.AddChild(new Button(buttonTexture, font, "Furniture") { OnClicked = (self) => SetMainVisibility((Panel)panel.Children.FirstOrDefault(c => c.HasTag("Furniture"))) });
+      panel.AddChild(new Button(buttonTexture, font, "Craft") { OnClicked = (self) => SetMainVisibility((Panel)panel.Children.FirstOrDefault(c => c.HasTag("Crafting"))) });
+      panel.AddChild(new Button(buttonTexture, font, "Tasks") { OnClicked = (self) => SetMainVisibility((Panel)panel.Children.FirstOrDefault(c => c.HasTag("Tasks"))) });
 
       var x = 5f;
       foreach (var control in panel.Children)
@@ -198,7 +198,7 @@ namespace Others.States
       };
       panel.AddChild(new Label(font, "Crafting") { Position = new Vector2(10, 20) });
       panel.AddChild(new ScrollBar(GameModel.GraphicsDevice, font, panelTexture.Height - 10) { Position = new Vector2(panelTexture.Width - 25, 5), IsFixedPosition = true });
-      panel.AddChild(new Button(buttonTexture, font, "Craft Hatchet") { Position = new Vector2(10, 40), OnClicked = () => _gwm.AddTask("craftAxe", 0, 0) });
+      panel.AddChild(new Button(buttonTexture, font, "Craft Hatchet") { Position = new Vector2(10, 40), OnClicked = (self) => _gwm.AddTask("craftAxe", 0, 0) });
       panel.AddChild(new Button(buttonTexture, font, "Craft Pickaxe") { Position = new Vector2(10, 90) });
       panel.AddTag("Main");
       panel.AddTag("Crafting");
@@ -264,7 +264,7 @@ namespace Others.States
 
       var panel = new Panel(panelTexture, new Vector2(0, (ZonerGame.ScreenHeight - 100) - panelTexture.Height));
       panel.AddChild(new Label(font, "Building") { Position = new Vector2(10, 20) });
-      panel.AddChild(new Button(buttonTexture, font, "Build House") { Position = new Vector2(10, 40), OnClicked = () => { State = States.Building; _hbm.Start(); } });
+      panel.AddChild(new Button(buttonTexture, font, "Build House") { Position = new Vector2(10, 40), OnClicked = (self) => { State = States.Building; _hbm.Start(); } });
       panel.AddTag("Main");
       panel.AddTag("Building");
 

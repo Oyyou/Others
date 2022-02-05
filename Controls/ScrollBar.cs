@@ -45,8 +45,8 @@ namespace Others.Controls
       var barTexture = new Texture2D(graphicsDevice, _backgroundTexture.Width - 4, 50);
       barTexture.SetData(Helpers.GetBorder(barTexture, 1, Color.Black, Color.Gray));
 
-      _topButton = new Button(upTexture) { Position = new Vector2(2, 2), OnClicked = () => SetBarButtonY(_thumbButton.Position.Y - _speed) };
-      _bottomButton = new Button(downTexture) { Position = new Vector2(2, height - (_backgroundTexture.Width - 2)), OnClicked = () => SetBarButtonY(_thumbButton.Position.Y + _speed) };
+      _topButton = new Button(upTexture) { Position = new Vector2(2, 2), OnClicked = (self) => SetBarButtonY(_thumbButton.Position.Y - _speed) };
+      _bottomButton = new Button(downTexture) { Position = new Vector2(2, height - (_backgroundTexture.Width - 2)), OnClicked = (self) => SetBarButtonY(_thumbButton.Position.Y + _speed) };
 
       _min = _topButton.Rectangle.Bottom + 2;
       _max = _bottomButton.Position.Y - 2 - barTexture.Height;

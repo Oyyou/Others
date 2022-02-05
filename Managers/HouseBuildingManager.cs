@@ -1,19 +1,30 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Others.Controls;
 using Others.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ZonerEngine.GL;
 using ZonerEngine.GL.Entities;
 using ZonerEngine.GL.Input;
 using ZonerEngine.GL.Maps;
+using ZonerEngine.GL.Models;
 
 namespace Others.Managers
 {
   public class HouseBuildingManager
   {
+    public enum States
+    {
+      LayingFoundation,
+      AddingInternalWalls,
+      AddingDoors,
+      AddingFurniture
+    }
+
     private Map _map;
     private Matrix _camera;
 
@@ -28,19 +39,132 @@ namespace Others.Managers
     private Rectangle _currentRectangle;
     private Rectangle _previousRectangle;
 
+    #region GUI
+    private List<Control> _controls = new List<Control>();
+
+    private Label _title;
+    private Button _prevButton;
+    private Button _nextButton;
+    #endregion
+
     public Action OnCancel;
 
     public Action<Rectangle> OnFinish;
 
-    public HouseBuildingManager(ContentManager content, Map map, Matrix camera)
+    public States State { get; private set; } = States.LayingFoundation;
+
+    public HouseBuildingManager(GameModel gameModel, Map map, Matrix camera)
     {
       _map = map;
       _camera = camera;
-      _texture = content.Load<Texture2D>("GUI/Drawer");
+      _texture = gameModel.Content.Load<Texture2D>("GUI/Drawer");
+
+      InitializeGUI(gameModel);
+    }
+
+    private void InitializeGUI(GameModel gameModel)
+    {
+      var font = gameModel.Content.Load<SpriteFont>("Font");
+
+      _title = new Label(font, "Laying foundation");
+      UpdateTitle();
+
+      var buttonTexture = new Texture2D(gameModel.GraphicsDevice, 120, 30);
+      buttonTexture.SetData(Helpers.GetBorder(buttonTexture.Width, buttonTexture.Height, 2, Color.Black, Color.White));
+
+      _prevButton = new Button(buttonTexture, font, "Cancel")
+      {
+        OnClicked = (self) =>
+        {
+          switch (State)
+          {
+            case States.LayingFoundation:
+              Cancel();
+              break;
+            case States.AddingInternalWalls:
+              State = States.LayingFoundation;
+              _prevButton.SetText("Cancel");
+              _nextButton.SetText("Next");
+              break;
+            case States.AddingDoors:
+              State = States.AddingInternalWalls;
+              _nextButton.SetText("Next");
+              break;
+            case States.AddingFurniture:
+              State = States.AddingDoors;
+              _nextButton.SetText("Next");
+              break;
+            default:
+              break;
+          }
+        },
+      };
+      _nextButton = new Button(buttonTexture, font, "Next")
+      {
+        OnClicked = (self) =>
+        {
+          switch (State)
+          {
+            case States.LayingFoundation:
+              State = States.AddingInternalWalls;
+              _prevButton.SetText("Prev");
+              break;
+            case States.AddingInternalWalls:
+              State = States.AddingDoors;
+              _prevButton.SetText("Prev");
+              break;
+            case States.AddingDoors:
+              State = States.AddingFurniture;
+              _prevButton.SetText("Prev");
+              _nextButton.SetText("Finish");
+              break;
+            case States.AddingFurniture:
+              Finish();
+              break;
+            default:
+              break;
+          }
+          //_nextButton.IsVisible = false;
+        },
+      };
+
+      _prevButton.IsVisible = true;
+      _nextButton.IsVisible = true;
+
+      _prevButton.Position = new Vector2((ZonerGame.ScreenWidth / 2) - ((buttonTexture.Width + 20)), 50);
+      _nextButton.Position = new Vector2((ZonerGame.ScreenWidth / 2) + 20, 50);
+
+      _controls.Add(_title);
+      _controls.Add(_prevButton);
+      _controls.Add(_nextButton);
+    }
+
+    private void UpdateTitle()
+    {
+      switch (State)
+      {
+        case States.LayingFoundation:
+          _title.Text = "Laying foundation";
+          break;
+        case States.AddingInternalWalls:
+          _title.Text = "Adding internals walls";
+          break;
+        case States.AddingDoors:
+          _title.Text = "Adding doors";
+          break;
+        case States.AddingFurniture:
+          _title.Text = "Adding furniture";
+          break;
+        default:
+          break;
+      }
+
+      _title.UpdatePosition(new Rectangle(0, 0, ZonerGame.ScreenWidth, 40));
     }
 
     public void Start()
     {
+      State = States.LayingFoundation;
       _cursorEntity = new DrawingSquare(_texture, DrawingSquare.States.Cursor);
       _cursorEntity.LoadContent();
 
@@ -63,7 +187,7 @@ namespace Others.Managers
 
     public void Finish()
     {
-      if(_entities.Count > 0)
+      if (_entities.Count > 0)
       {
         OnFinish?.Invoke(_currentRectangle);
       }
@@ -76,12 +200,12 @@ namespace Others.Managers
       if (!_isVisible)
         return;
 
-      if(GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Escape))
+      if (GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Escape))
       {
         Cancel();
       }
 
-      if(GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Enter))
+      if (GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Enter))
       {
         Finish();
       }
@@ -89,6 +213,29 @@ namespace Others.Managers
       var mousePosition = new Point((int)Math.Floor(GameMouse.Position.X / (double)Game1.TileSize) * Game1.TileSize, (int)Math.Floor(GameMouse.Position.Y / (double)Game1.TileSize) * Game1.TileSize).ToVector2();
       _cursorEntity.Position = mousePosition;
 
+
+      foreach (var control in _controls)
+        control.Update(gameTime);
+
+      UpdateTitle();
+
+      LayingFoundationUpdate();
+
+      _cursorEntity.Update(gameTime, _entities);
+      foreach (var entity in _entities)
+        entity.Update(gameTime, _entities);
+    }
+
+    private void LayingFoundationUpdate()
+    {
+      if (State != States.LayingFoundation)
+        return;
+
+      // Don't lay wall while over a button
+      if (GameMouse.ClickableObjects.Count > 0)
+        return;
+
+      var mousePosition = _cursorEntity.Position;
       if (GameMouse.IsLeftPressed)
       {
         if (_startPosition == null)
@@ -174,15 +321,11 @@ namespace Others.Managers
       else
       {
         _startPosition = null;
-        if(_entities.Any(c => ((DrawingSquare)c).State != DrawingSquare.States.Fine))
+        if (_entities.Any(c => ((DrawingSquare)c).State != DrawingSquare.States.Fine))
         {
           _entities.Clear();
         }
       }
-
-      _cursorEntity.Update(gameTime, _entities);
-      foreach (var entity in _entities)
-        entity.Update(gameTime, _entities);
     }
 
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch, Matrix camera)
@@ -196,6 +339,13 @@ namespace Others.Managers
 
       foreach (var entity in _entities)
         entity.Draw(gameTime, spriteBatch);
+
+      spriteBatch.End();
+
+      spriteBatch.Begin();
+
+      foreach (var control in _controls)
+        control.Draw(gameTime, spriteBatch);
 
       spriteBatch.End();
     }

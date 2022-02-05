@@ -16,7 +16,7 @@ namespace Others.Controls
     public string Text
     {
       get { return _label.Text; }
-      set
+      protected set
       {
         _label.Text = value;
       }
@@ -37,15 +37,27 @@ namespace Others.Controls
         _label = new Label(font, text)
         {
           IsVisible = true,
-          Position = new Vector2((_texture.Width / 2) - (font.MeasureString(text).X / 2), (_texture.Height / 2) - (font.MeasureString(text).Y / 2)),
         };
 
         AddChild(_label);
+        _label.UpdatePosition(); // Notice how I'm setting the position AFTER I've assigned the parent
       }
+    }
+
+    public void SetText(string text)
+    {
+      if (_label == null)
+        return;
+
+      _label.Text = text;
+      _label.UpdatePosition();
     }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
+      if (!IsVisible)
+        return;
+
       spriteBatch.Draw(_texture, DrawPosition, null, IsMouseOver ? HoverColour : Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, DrawLayer);
       DrawChildren(gameTime, spriteBatch);
     }

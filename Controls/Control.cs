@@ -100,7 +100,7 @@ namespace Others.Controls
 
     public Action OnHeld { get; set; } = null;
 
-    public Action OnClicked { get; set; } = null;
+    public Action<Control> OnClicked { get; set; } = null;
 
     public Action<Control> OnAddChild { get; set; } = null;
 
@@ -143,6 +143,9 @@ namespace Others.Controls
 
     public virtual void Update(GameTime gameTime)
     {
+      if (!IsVisible)
+        return;
+
       IsMouseOver = false;
       IsMouseDown = false;
       IsMouseClicked = false;
@@ -168,8 +171,9 @@ namespace Others.Controls
 
           if (GameMouse.IsLeftClicked)
           {
+            GameMouse.ClickableObjects.Remove(this);
             IsMouseClicked = true;
-            OnClicked?.Invoke();
+            OnClicked?.Invoke(this);
           }
         }
       }
@@ -203,6 +207,9 @@ namespace Others.Controls
 
     public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
+      if (!IsVisible)
+        return;
+
       DrawChildren(gameTime, spriteBatch);
     }
 

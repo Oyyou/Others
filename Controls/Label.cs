@@ -20,6 +20,22 @@ namespace Others.Controls
       Text = text;
     }
 
+    public void UpdatePosition()
+    {
+      if (Parent == null)
+        return;
+
+      UpdatePosition(Parent.Rectangle);
+    }
+
+    public void UpdatePosition(Rectangle rectangle)
+    {
+      var parentWidth = rectangle.Width;
+      var parentHeight = rectangle.Height;
+
+      Position = new Vector2((parentWidth / 2) - (_font.MeasureString(Text).X / 2), (parentHeight / 2) - (_font.MeasureString(Text).Y / 2));
+    }
+
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
       spriteBatch.DrawString(_font, Text, DrawPosition, Color.Black, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, DrawLayer);

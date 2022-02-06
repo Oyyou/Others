@@ -328,7 +328,7 @@ namespace Others.States
       _entities.Add(entity);
     }
 
-    public Entity AddPlaceEntity(Models.PlaceWrapper place, Dictionary<string, string> additionalValues = null)
+    public Entity AddPlaceEntity(Models.PlaceWrapper place)
     {
       try
       {
@@ -339,7 +339,7 @@ namespace Others.States
 
         if (place.Data.Type == "Wall")
         {
-          textureName = $"Places/Walls/{additionalValues["wallType"]}";
+          textureName = $"Places/Walls/{place.AdditionalProperties["wallType"].Value}";
         }
 
         var texture = _content.Load<Texture2D>(textureName);

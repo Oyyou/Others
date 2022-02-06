@@ -127,12 +127,20 @@ namespace Others.Managers
       place.Point = new Microsoft.Xna.Framework.Point(x, y);
       place.LoadFromData((Place)GameWorld.PlaceData[placeName].Clone());
 
-      //if (additionalValues != null)
-        //place.AdditionalProperties = place.AdditionalProperties.Add("wallType", new AdditionalProperty().Value);
+      if (additionalValues != null)
+      {
+        foreach (var value in additionalValues)
+        {
+          if (place.AdditionalProperties.ContainsKey(value.Key))
+            continue;
+
+          place.AdditionalProperties.Add(value.Key, new AdditionalProperty() { Value = value.Value, IsVisible = false });
+        }
+      }
 
       GameWorld.Places.Add(place);
 
-      _state.AddPlaceEntity(place, additionalValues);
+      _state.AddPlaceEntity(place);
 
       return place;
     }

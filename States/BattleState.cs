@@ -196,9 +196,11 @@ namespace Others.States
           scrollBar.SetRectangle(rectangle);
         }
       };
+
+      //var craftingLocations = _gwm.GameWorld.Places.Where(c => c.Data.Type == "Crafting");
       panel.AddChild(new Label(font, "Crafting") { Position = new Vector2(10, 20) });
       panel.AddChild(new ScrollBar(GameModel.GraphicsDevice, font, panelTexture.Height - 10) { Position = new Vector2(panelTexture.Width - 25, 5), IsFixedPosition = true });
-      panel.AddChild(new Button(buttonTexture, font, "Craft Hatchet") { Position = new Vector2(10, 40), OnClicked = (self) => _gwm.AddTask("craftAxe", 0, 0) });
+      panel.AddChild(new Button(buttonTexture, font, "Craft Hatchet") { Position = new Vector2(10, 40), OnClicked = (self) => _gwm.AddTask("craftAxe", 0, _gwm.GameWorld.Places.Where(c => c.Data.Type == "Crafting").FirstOrDefault().Id) });
       panel.AddChild(new Button(buttonTexture, font, "Craft Pickaxe") { Position = new Vector2(10, 90) });
       panel.AddTag("Main");
       panel.AddTag("Crafting");
@@ -334,6 +336,7 @@ namespace Others.States
 
         // Special wall logic that requires us to know what part of the wall we're in
         // UUUUUUGH
+
         if (place.Data.Type == "Wall")
         {
           textureName = $"Places/Walls/{additionalValues["wallType"]}";

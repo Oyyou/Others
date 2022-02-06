@@ -126,6 +126,10 @@ namespace Others.Managers
       place.Id = GetId("place");
       place.Point = new Microsoft.Xna.Framework.Point(x, y);
       place.LoadFromData((Place)GameWorld.PlaceData[placeName].Clone());
+
+      //if (additionalValues != null)
+        //place.AdditionalProperties = place.AdditionalProperties.Add("wallType", new AdditionalProperty().Value);
+
       GameWorld.Places.Add(place);
 
       _state.AddPlaceEntity(place, additionalValues);
@@ -613,6 +617,8 @@ namespace Others.Managers
       //AddPlace("goldOre", 5, 8);
       //AddPlace("goldOre", 1, 4);
       //AddPlace("goldOre", 2, 2);
+
+      AddPlace("craftingBench", 3, 5);
 
       AddPlace("rocks", 1, 2);
 

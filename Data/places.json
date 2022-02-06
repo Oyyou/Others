@@ -29,7 +29,7 @@
       "type": "Floor",
       "description": "floor",
       "collisionType": "None",
-      "layer": 0.0,
+      "layer": 0.0
     },
     {
       "name": "goldOre",
@@ -67,7 +67,7 @@
     },
     {
       "name": "sticks",
-      "skill" : "gathering",
+      "skill": "gathering",
       "type": "Gathering",
       "description": "Cheeky pile of sticks on the floor",
       "collisionType": "None",
@@ -108,6 +108,19 @@
       "additionalProperties": {
         "capacity": {
           "value": 50,
+          "isVisible": true
+        }
+      }
+    },
+    {
+      "name": "craftingBench",
+      "skill": "crafting",
+      "type": "Crafting",
+      "description": "",
+      "collisionType": "Full",
+      "additionalProperties": {
+        "capacity": {
+          "value": 100,
           "isVisible": true
         }
       }

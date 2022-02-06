@@ -292,7 +292,7 @@ namespace Others.Models
 
     public void DoCraftingTask(GameWorldManager gwm)
     {
-      //var places = Current;
+      var craftingLocations = gwm.GameWorld.Places.Where(c => c.Data.Type == "Crafting");
       var task = CurrentTask.Data;
       var inv = gwm.GetInventory();
       var producedItem = CurrentTask.Data.ProducedItems[0];
@@ -316,12 +316,14 @@ namespace Others.Models
       //check if has resouce required is true
       if (HasRequiredResources)
       {
+        //GoToPlace(craftingLocations.FirstOrDefault(c => c.Name == task.Name));
         AddToInventory(gwm, producedItem);
         CurrentTask = null;
+      
       }
       else
       {
-        gwm.AddTask(CurrentTask.Name, CurrentTask.Priority, CurrentTask.PlaceId);
+        gwm.AddTask(CurrentTask.Name, CurrentTask.Priority, CurrentTask.PlaceId); //craftingLocations.FirstOrDefault().Id); //
         CurrentTask = null;
       }
     }

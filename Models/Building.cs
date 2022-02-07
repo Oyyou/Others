@@ -8,9 +8,9 @@ namespace Others.Models
 {
   public class Building
   {
-    public Dictionary<Point, Wall> Walls { get; set; } = new Dictionary<Point, Wall>();
+    public Dictionary<Point, Place> Walls { get; set; } = new Dictionary<Point, Place>();
 
-    public Dictionary<Point, Basic> Doors { get; set; } = new Dictionary<Point, Basic>();
+    public Dictionary<Point, Place> Doors { get; set; } = new Dictionary<Point, Place>();
 
     public Rectangle Rectangle { get; set; }
   }

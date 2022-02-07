@@ -36,6 +36,8 @@ namespace Others.States
 
     public Map Map { get; private set; }
 
+    private Entity _underConstruction;
+
     private List<Entity> _entities = new List<Entity>();
 
     private GameWorldManager _gwm;
@@ -87,11 +89,14 @@ namespace Others.States
       _gwm = new GameWorldManager(this);
       _gwm.Load("save.json");
 
-      _hbm = new HouseBuildingManager(GameModel, Map, _camera)
+      _hbm = new HouseBuildingManager(GameModel, _gwm, Map, _camera)
       {
         OnCancel = () => State = States.Playing,
         OnFinish = (Models.Building building) => _gwm.AddHousehold("", building),
       };
+
+      _underConstruction = new Basic(_content.Load<Texture2D>("Places/Construction"), new Vector2(0, 0));
+      _underConstruction.LoadContent();
 
       PathManager = new PathManager(Map);
       PathManager.LoadContent(_content);
@@ -101,12 +106,12 @@ namespace Others.States
       _controls = new List<Control>()
       {
         GetControlsPanel(),
-        GetBuildingItemsPanel(),
+        //GetBuildingItemsPanel(),
       };
 
       _buildingControls = new List<Control>()
       {
-        GetBuildingItemsPanel(),
+        //GetBuildingItemsPanel(),
       };
       #endregion
     }
@@ -347,6 +352,11 @@ namespace Others.States
         var yOffset = place.Data.YOriginPercentage != 0 ? (place.Data.YOriginPercentage / 100f) * texture.Height : 0;
         var placeEntity = new Place(place, texture, this) { Layer = place.Data.Layer >= 0 ? place.Data.Layer : 0.09f, PositionOffset = new Vector2(xOffset, yOffset), Colour = place.Data.Tint };
 
+        foreach (var additional in place.AdditionalProperties)
+        {
+          placeEntity.AdditionalProperties.Add(additional.Key, additional.Value.Value.ToString());
+        }
+
         AddEntity(placeEntity);
 
         return placeEntity;
@@ -361,6 +371,19 @@ namespace Others.States
       }
 
       return null;
+    }
+
+    public Entity EditPlaceEntity(Models.PlaceWrapper place)
+    {
+      var places = _entities.Where(c => c is Place).Select(c => c as Place);
+      var placeEntity = places.FirstOrDefault(c => c.Wrapper.Id == place.Id);
+
+      if (placeEntity == null)
+        return null;
+
+      placeEntity.Wrapper = place;
+
+      return placeEntity;
     }
 
     public Entity AddVillagerEntity(Models.Villager villager)
@@ -452,7 +475,23 @@ namespace Others.States
       _spriteBatch.Begin(SpriteSortMode.FrontToBack, transformMatrix: _camera);
 
       foreach (var entity in _entities)
-        entity.Draw(gameTime, _spriteBatch);
+      {
+        bool draw = true;
+        if (entity.AdditionalProperties.ContainsKey("construction%"))
+        {
+          if (entity.AdditionalProperties["construction%"] != "100")
+          {
+            draw = false;
+            _underConstruction.Position = entity.Position;
+            _underConstruction.Draw(gameTime, _spriteBatch);
+          }
+        }
+
+        if (draw)
+        {
+          entity.Draw(gameTime, _spriteBatch);
+        }
+      }
 
       _spriteBatch.End();
 

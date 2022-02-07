@@ -13,7 +13,28 @@ namespace Others.Entities
 {
   public class Place : Entity
   {
-    public readonly Models.PlaceWrapper Wrapper;
+    private Models.PlaceWrapper _wrapper;
+
+    public Models.PlaceWrapper Wrapper
+    {
+      get { return _wrapper; }
+      set
+      {
+        if (_wrapper != null)
+        {
+          foreach (var prop in _wrapper.AdditionalProperties)
+          {
+            if (!AdditionalProperties.ContainsKey(prop.Key))
+              AdditionalProperties.Add(prop.Key, "");
+
+            AdditionalProperties[prop.Key] = prop.Value.Value;
+          }
+        }
+
+        _wrapper = value;
+      }
+    }
+
     /// <summary>
     /// Where the tile is on the map
     /// </summary>

@@ -21,6 +21,8 @@ namespace Others.Entities
 
     private Texture2D _texture;
 
+    public readonly Models.Place Place;
+
     public Rectangle Rectangle
     {
       get
@@ -49,8 +51,9 @@ namespace Others.Entities
 
     public bool HasDoor { get; set; } = false;
 
-    public Wall(Texture2D texture, Vector2 position, Types type)
+    public Wall(Models.Place place, Texture2D texture, Vector2 position, Types type)
     {
+      Place = place;
       _texture = texture;
       Position = position;
       Type = type;

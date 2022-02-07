@@ -11,6 +11,9 @@
       "type": "Wall",
       "description": "This is obviously a wall",
       "collisionType": "Full",
+      "resourceCost": {
+        "wood": 10
+      },
       "tint": {
         "B": 74,
         "G": 85,
@@ -22,13 +25,19 @@
       "name": "woodenDoor",
       "type": "Door",
       "description": "It's like a wall, but isn't",
-      "collisionType": "None"
+      "collisionType": "None",
+      "resourceCost": {
+        "wood": 8
+      }
     },
     {
       "name": "woodenFloor",
       "type": "Floor",
       "description": "floor",
       "collisionType": "None",
+      "resourceCost": {
+        "wood": 2
+      },
       "layer": 0.0
     },
     {

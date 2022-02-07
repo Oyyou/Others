@@ -50,6 +50,6 @@ namespace Others.Models
     public List<ProducedItem> ProducedItems { get; set; }
 
     [JsonProperty("skillRequirements")]
-    public List<SkillRequirement> SkillRequirements { get; set; }
+    public List<SkillRequirement> SkillRequirements { get; set; } = new List<SkillRequirement>();
   }
 }

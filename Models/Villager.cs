@@ -219,6 +219,13 @@ namespace Others.Models
       }
     }
 
+    public void DoConstructionTask(GameWorldManager gwm)
+    {
+      var place = gwm.GameWorld.Places.FirstOrDefault(c => c.Id == this.CurrentTask.PlaceId);
+      place.AdditionalProperties["construction%"].Value = "100";
+      CurrentTask = null;
+    }
+
     private void AddToInventory(GameWorldManager gwm, Task.ProducedItem item)
     {
       var items = gwm.GameWorld.ItemData;

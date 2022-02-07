@@ -27,15 +27,19 @@ namespace Others.Managers
     }
 
     private GameModel _gameModel;
+    private GameWorldManager _gwm;
     private Map _map;
     private Matrix _camera;
 
     private Texture2D _texture;
+    private SpriteFont _font;
     private List<Entity> _entities = new List<Entity>();
     private Entity _cursorEntity;
 
-    #region Adding internal walls
+    #region Walls and stuff
     private Building _building;
+    private List<Wall> _walls;
+    private List<Basic> _doors;
     #endregion
 
     private bool _isVisible = false;
@@ -48,6 +52,8 @@ namespace Others.Managers
     #region GUI
     private List<Control> _controls = new List<Control>();
 
+    private Panel _informationPanel;
+
     private Label _title;
     private Button _prevButton;
     private Button _nextButton;
@@ -59,12 +65,14 @@ namespace Others.Managers
 
     public States State { get; private set; } = States.LayingFoundation;
 
-    public HouseBuildingManager(GameModel gameModel, Map map, Matrix camera)
+    public HouseBuildingManager(GameModel gameModel, GameWorldManager gwm, Map map, Matrix camera)
     {
       _gameModel = gameModel;
+      _gwm = gwm;
       _map = map;
       _camera = camera;
       _texture = _gameModel.Content.Load<Texture2D>("GUI/Drawer");
+      _font = gameModel.Content.Load<SpriteFont>("Font");
 
       _building = new Building();
 
@@ -73,15 +81,18 @@ namespace Others.Managers
 
     private void InitializeGUI(GameModel gameModel)
     {
-      var font = gameModel.Content.Load<SpriteFont>("Font");
+      var infoTexture = new Texture2D(gameModel.GraphicsDevice, 250, 400);
+      infoTexture.SetData(Helpers.GetBorder(infoTexture.Width, infoTexture.Height, 2, Color.Black, Color.White));
 
-      _title = new Label(font, "Laying foundation");
+      _informationPanel = new Panel(infoTexture, new Vector2(0, ZonerGame.ScreenHeight - infoTexture.Height));
+
+      _title = new Label(_font, "Laying foundation");
       UpdateTitle();
 
       var buttonTexture = new Texture2D(gameModel.GraphicsDevice, 120, 30);
       buttonTexture.SetData(Helpers.GetBorder(buttonTexture.Width, buttonTexture.Height, 2, Color.Black, Color.White));
 
-      _prevButton = new Button(buttonTexture, font, "Cancel")
+      _prevButton = new Button(buttonTexture, _font, "Cancel")
       {
         OnClicked = (self) =>
         {
@@ -99,7 +110,7 @@ namespace Others.Managers
               State = States.AddingInternalWalls;
               _nextButton.SetText("Next");
               foreach (var wall in _building.Walls)
-                wall.Value.HasDoor = false;
+                wall.Value.AdditionalProperties["hasDoor"] = new AdditionalProperty() { IsVisible = false, Value = false };
 
               UpdateWallTextures();
               break;
@@ -112,7 +123,7 @@ namespace Others.Managers
           }
         },
       };
-      _nextButton = new Button(buttonTexture, font, "Next")
+      _nextButton = new Button(buttonTexture, _font, "Next")
       {
         OnClicked = (self) =>
         {
@@ -123,16 +134,16 @@ namespace Others.Managers
               {
                 State = States.AddingInternalWalls;
                 _prevButton.SetText("Prev");
-                var walls = GameWorldManager.GetOuterWalls(_currentRectangle.Divide(40));
-                _building.Walls = new Dictionary<Point, Wall>();
-                _building.Doors = new Dictionary<Point, Basic>();
+                var walls = GameWorldManager.GetOuterWalls(_currentRectangle.Divide(Game1.TileSize));
+                _building.Walls = new Dictionary<Point, Models.Place>();
+                _building.Doors = new Dictionary<Point, Models.Place>();
                 _building.Rectangle = _currentRectangle;
                 foreach (var wall in walls)
                 {
-                  var wallEntity = new Wall(_gameModel.Content.Load<Texture2D>($"Places/Walls/{wall.Value}"), wall.Key.Multiply(Game1.TileSize).ToVector2(), Wall.Types.External);
-                  wallEntity.LoadContent();
-                  _building.Walls.Add(wall.Key, wallEntity);
+                  AddWall(wall.Key);
                 }
+
+                UpdateWallTextures();
               }
               break;
             case States.AddingInternalWalls:
@@ -142,17 +153,22 @@ namespace Others.Managers
 
               foreach (var door in _building.Doors)
               {
-                var wall = _building.Walls.FirstOrDefault(c => c.Value.Position == door.Value.Position);
-                wall.Value.HasDoor = true;
+                if (!_building.Walls.ContainsKey(door.Key))
+                  continue;
+
+                _building.Walls[door.Key].AdditionalProperties["hasDoor"] = new AdditionalProperty() { IsVisible = false, Value = true };
               }
 
               UpdateWallTextures();
 
               break;
             case States.AddingDoors:
-              State = States.AddingFurniture;
-              _prevButton.SetText("Prev");
-              _nextButton.SetText("Finish");
+              if (_building.Doors.Count > 0)
+              {
+                State = States.AddingFurniture;
+                _prevButton.SetText("Prev");
+                _nextButton.SetText("Finish");
+              }
               break;
             case States.AddingFurniture:
               Finish();
@@ -170,9 +186,31 @@ namespace Others.Managers
       _prevButton.Position = new Vector2((ZonerGame.ScreenWidth / 2) - ((buttonTexture.Width + 20)), 50);
       _nextButton.Position = new Vector2((ZonerGame.ScreenWidth / 2) + 20, 50);
 
+      _controls.Add(_informationPanel);
       _controls.Add(_title);
       _controls.Add(_prevButton);
       _controls.Add(_nextButton);
+    }
+
+    private void UpdateWallTextures()
+    {
+      var walls = _building.Walls.Where(c => !hasDoor(c));
+
+      var newPoints = GameWorldManager.GetWalls(walls.Select(c => new Rectangle(c.Key.X, c.Key.Y, Game1.TileSize, Game1.TileSize)).ToList());
+      foreach (var wall in walls)
+      {
+        if (!wall.Value.AdditionalProperties.ContainsKey("wallType"))
+          wall.Value.AdditionalProperties.Add("wallType", new AdditionalProperty() { IsVisible = false });
+
+        wall.Value.AdditionalProperties["wallType"].Value = newPoints[wall.Key];
+      }
+    }
+
+    private void AddWall(Point key)
+    {
+      var wrapper = (Models.Place)_gwm.GameWorld.PlaceData["woodenWall"].Clone();
+      wrapper.AdditionalProperties.Add("hasDoor", new AdditionalProperty() { Value = false, IsVisible = false });
+      _building.Walls.Add(key, wrapper);
     }
 
     private void UpdateTitle()
@@ -279,6 +317,7 @@ namespace Others.Managers
       foreach (var control in _controls)
         control.Update(gameTime);
 
+      UpdateResourceCosts();
       UpdateTitle();
       UpdateCursor();
 
@@ -288,9 +327,66 @@ namespace Others.Managers
 
       AddingDoors(gameTime);
 
+      AddEntities();
+
       _cursorEntity.Update(gameTime);
       foreach (var entity in _entities)
         entity.Update(gameTime);
+    }
+
+    private void AddEntities()
+    {
+      _walls = new List<Wall>();
+      _doors = new List<Basic>();
+      foreach(var wall in _building.Walls.Where(c => !hasDoor(c)))
+      {
+        var type = wall.Value.AdditionalProperties["wallType"].Value;
+
+        var wallEntity = new Wall(wall.Value, _gameModel.Content.Load<Texture2D>($"Places/Walls/{type}"), wall.Key.Multiply(Game1.TileSize).ToVector2(), Wall.Types.External);
+        wallEntity.LoadContent();
+
+        _walls.Add(wallEntity);
+      }
+
+      foreach(var door in _building.Doors)
+      {
+        var doorEntity = new Basic(_gameModel.Content.Load<Texture2D>($"Places/woodenDoor"), door.Key.Multiply(Game1.TileSize).ToVector2());
+        doorEntity.LoadContent();
+
+        _doors.Add(doorEntity);
+      }
+    }
+
+    private void UpdateResourceCosts()
+    {
+      var costs = new Dictionary<string, long>();
+
+      foreach (var wall in _building.Walls.Where(c => !hasDoor(c)))
+      {
+
+        foreach (var resource in wall.Value.ResourceCost)
+        {
+          if (!costs.ContainsKey(resource.Key))
+            costs.Add(resource.Key, 0);
+
+          costs[resource.Key] += resource.Value;
+        }
+      }
+
+      _informationPanel.Children.Clear();
+      _informationPanel.AddChild(new Label(_font, "Resource cost:") { Position = new Vector2(10, 10), });
+
+      var y = 30f;
+      foreach (var cost in costs)
+      {
+        _informationPanel.AddChild(new Label(_font, $"{cost.Key}: {cost.Value}") { Position = new Vector2(10, y), });
+        y += (_font.MeasureString(cost.Key).Y + 5);
+      }
+    }
+
+    private static bool hasDoor(KeyValuePair<Point, Models.Place> c)
+    {
+      return c.Value.AdditionalProperties.ContainsKey("hasDoor") && (bool)c.Value.AdditionalProperties["hasDoor"].Value;
     }
 
     private void LayingFoundationUpdate(GameTime gameTime)
@@ -400,43 +496,30 @@ namespace Others.Managers
       if (State != States.AddingInternalWalls)
         return;
 
-      foreach (var wall in _building.Walls)
-        wall.Value.Update(gameTime);
+      //foreach (var wall in _building.Walls)
+      //  wall.Value.Update(gameTime);
 
       if (!GameMouse.Intersects(_currentRectangle, true))
         return;
 
       if (GameMouse.IsLeftPressed)
       {
-        if (_building.Walls.Any(c => c.Value.Position == _cursorEntity.Position))
+        var key = (_cursorEntity.Position / Game1.TileSize).ToPoint();
+        if (_building.Walls.ContainsKey(key))
           return;
 
-        var wallEntity = new Wall(_gameModel.Content.Load<Texture2D>($"Places/Walls/Wall"), _cursorEntity.Position, Wall.Types.Interal);
-        wallEntity.LoadContent();
-        _building.Walls.Add(wallEntity.Point, wallEntity);
+        AddWall(key);
 
-        var newPoints = GameWorldManager.GetWalls(_building.Walls.Select(c => c.Value.Rectangle.Divide(40)).ToList());
-        foreach (var wall in _building.Walls)
-        {
-          wall.Value.ChangeTexture(_gameModel.Content.Load<Texture2D>($"Places/Walls/{newPoints[wall.Value.Point]}"));
-        }
+        UpdateWallTextures();
       }
       else if (GameMouse.IsRightPressed)
       {
+        /*
         var wall = _building.Walls.Where(c => c.Value.Type == Wall.Types.Interal).FirstOrDefault(c => c.Value.Position == _cursorEntity.Position);
         _building.Walls.Remove(wall.Key);
 
         UpdateWallTextures();
-      }
-    }
-
-    private void UpdateWallTextures()
-    {
-      var walls = _building.Walls.Where(c => !c.Value.HasDoor);
-      var newPoints = GameWorldManager.GetWalls(walls.Select(c => c.Value.Rectangle.Divide(40)).ToList());
-      foreach (var w in walls)
-      {
-        w.Value.ChangeTexture(_gameModel.Content.Load<Texture2D>($"Places/Walls/{newPoints[w.Value.Point]}"));
+        */
       }
     }
 
@@ -445,11 +528,13 @@ namespace Others.Managers
       if (State != States.AddingDoors)
         return;
 
-      foreach (var wall in _building.Walls)
-        wall.Value.Update(gameTime);
+      /*
+      foreach (var wall in _walls)
+        wall.Update(gameTime);
 
-      foreach (var door in _building.Doors)
-        door.Value.Update(gameTime);
+      foreach (var door in _doors)
+        door.Update(gameTime);
+      */
 
       if (!GameMouse.Intersects(_currentRectangle, true))
         return;
@@ -457,7 +542,7 @@ namespace Others.Managers
       if (GameMouse.IsLeftClicked)
       {
 
-        var key = (_cursorEntity.Position / 40).ToPoint();
+        var key = (_cursorEntity.Position / Game1.TileSize).ToPoint();
         if (!_building.Walls.ContainsKey(key))
           return;
 
@@ -466,17 +551,16 @@ namespace Others.Managers
 
         var wall = _building.Walls[key];
 
-        wall.HasDoor = true;
+        wall.AdditionalProperties["hasDoor"].Value = true;
 
-        var door = new Basic(_gameModel.Content.Load<Texture2D>($"Places/woodenDoor"), wall.Position);
-        door.LoadContent();
+        var wrapper = (Models.Place)_gwm.GameWorld.PlaceData["woodenDoor"].Clone();
+        _building.Doors.Add(key, wrapper);
 
-        _building.Doors.Add(key, door);
         UpdateWallTextures();
       }
       else if (GameMouse.IsRightClicked)
       {
-        var key = (_cursorEntity.Position / 40).ToPoint();
+        var key = (_cursorEntity.Position / Game1.TileSize).ToPoint();
         if (!_building.Walls.ContainsKey(key))
           return;
 
@@ -485,9 +569,7 @@ namespace Others.Managers
         if (!_building.Doors.ContainsKey(key))
           return;
 
-        var door = _building.Walls[key];
-
-        wall.HasDoor = false;
+        wall.AdditionalProperties["hasDoor"].Value = false;
         _building.Doors.Remove(key);
         UpdateWallTextures();
       }
@@ -505,14 +587,14 @@ namespace Others.Managers
 
       if (State > States.LayingFoundation)
       {
-        foreach (var entity in _building.Walls)
-          entity.Value.Draw(gameTime, spriteBatch);
+        foreach (var entity in _walls)
+          entity.Draw(gameTime, spriteBatch);
       }
 
       if (State > States.AddingInternalWalls)
       {
-        foreach (var door in _building.Doors)
-          door.Value.Draw(gameTime, spriteBatch);
+        foreach (var door in _doors)
+          door.Draw(gameTime, spriteBatch);
       }
 
       _cursorEntity.Draw(gameTime, spriteBatch);

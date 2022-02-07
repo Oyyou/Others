@@ -10,6 +10,9 @@ namespace Others.Models
     [JsonProperty("id")]
     public long Id { get; set; }
 
+    [JsonProperty("householdId")]
+    public long HouseholdId { get; set; } = -1;
+
     [JsonProperty("name")]
     public string Name { get; private set; }
 
@@ -30,6 +33,9 @@ namespace Others.Models
 
     [JsonIgnore]
     public Place Data { get; set; }
+
+    [JsonIgnore]
+    public Household Household { get; set; } = null;
 
     public PlaceWrapper()
     {

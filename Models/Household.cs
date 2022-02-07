@@ -16,9 +16,6 @@ namespace Others.Models
     [JsonProperty("villagerIds")]
     public List<long> VillagerIds { get; set; } = new List<long>();
 
-    [JsonProperty("placeId")]
-    public long PlaceId { get; set; }
-
     /// <summary>
     /// Surname of the family
     /// </summary>
@@ -28,13 +25,9 @@ namespace Others.Models
     [JsonIgnore]
     public List<Villager> Villagers { get; set; } = new List<Villager>();
 
-    [JsonIgnore]
-    public PlaceWrapper Place { get; set; }
-
     public void Load(GameWorldManager gwm)
     {
       Villagers = VillagerIds.Select(c => gwm.GetVillagerById(c)).ToList();
-      Place = gwm.GetPlaceById(this.PlaceId);
     }
 
     public void AssignVillager(Villager villager)

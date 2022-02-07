@@ -55,6 +55,15 @@ namespace Others.Managers
       GameWorld.Tasks.Add(task);
     }
 
+    public void RemoveTask(string taskName, long placeId)
+    {
+      var task = GameWorld.Tasks.FirstOrDefault(c => c.Name == taskName && c.PlaceId == placeId);
+      if (task == null)
+        return;
+
+      GameWorld.Tasks.Remove(task);
+    }
+
     public bool AssignTask(TaskWrapper task)
     {
       var requiredSkills = task.Data.SkillRequirements;
@@ -114,7 +123,16 @@ namespace Others.Managers
       return false;
     }
 
-    public PlaceWrapper AddPlace(string placeName, int x, int y, Dictionary<string, string> additionalValues = null)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="placeName">The type of place</param>
+    /// <param name="x">Map x coord</param>
+    /// <param name="y">Map y coor</param>
+    /// <param name="householdId">The household this place belongs to</param>
+    /// <param name="additionalValues"></param>
+    /// <returns></returns>
+    public PlaceWrapper AddPlace(string placeName, int x, int y, long householdId = -1, Dictionary<string, string> additionalValues = null)
     {
       if (!GameWorld.PlaceData.ContainsKey(placeName))
       {
@@ -126,6 +144,11 @@ namespace Others.Managers
       place.Id = GetId("place");
       place.Point = new Microsoft.Xna.Framework.Point(x, y);
       place.LoadFromData((Place)GameWorld.PlaceData[placeName].Clone());
+      if (householdId > 0)
+      {
+        place.HouseholdId = householdId;
+        place.Household = GameWorld.Households.FirstOrDefault(c => c.Id == place.HouseholdId);
+      }
 
       if (additionalValues != null)
       {
@@ -136,6 +159,11 @@ namespace Others.Managers
 
           place.AdditionalProperties.Add(value.Key, new AdditionalProperty() { Value = value.Value, IsVisible = false });
         }
+      }
+
+      if(place.AdditionalProperties.ContainsKey("construction%"))
+      {
+        AddTask("construct", 1, place.Id);
       }
 
       GameWorld.Places.Add(place);
@@ -195,52 +223,6 @@ namespace Others.Managers
       }
     }
 
-    public Household AddHousehold(string name, Rectangle size)
-    {
-      var place = AddPlace("house", new Point(size.X, size.Y));
-      place.Width = size.Width;
-      place.Height = size.Height;
-
-      var household = new Household()
-      {
-        Id = GetId("household"),
-        Name = name,
-      };
-
-      var points = new List<Point>();
-
-      for (int y = size.Y; y < size.Bottom; y++)
-      {
-        for (int x = size.X; x < size.Right; x++)
-        {
-          var addWall = y == size.Y ||
-            x == size.X ||
-            y == (size.Bottom - 1) ||
-            x == (size.Right - 1);
-
-          var addDoor = y == (size.Bottom - 1) && (x == size.X + (size.Width / 2));
-
-          if (addDoor)
-            AddPlace("woodenDoor", x, y);
-          else if (addWall)
-            points.Add(new Point(x, y));
-          else
-            AddPlace("woodenFloor", x, y);
-        }
-      }
-
-      foreach (var wall in points)
-      {
-        string wallType = GetWallType(wall, points);
-
-        AddPlace("woodenWall", wall.X, wall.Y, new Dictionary<string, string>() { { "wallType", wallType } });
-      }
-
-      GameWorld.Households.Add(household);
-
-      return household;
-    }
-
     public Household AddHousehold(string name, Building building)
     {
       var household = new Household()
@@ -248,6 +230,7 @@ namespace Others.Managers
         Id = GetId("household"),
         Name = name,
       };
+      GameWorld.Households.Add(household);
 
       var size = building.Rectangle.Divide(Game1.TileSize);
 
@@ -256,18 +239,36 @@ namespace Others.Managers
         for (int x = size.X; x < size.Right; x++)
         {
           var point = new Point(x, y);
+          string type = "woodenFloor";
+          var additionalProperties = new Dictionary<string, string>();
+          additionalProperties.Add("construction%", "0");
 
           if (building.Doors.ContainsKey(point))
-            AddPlace("woodenDoor", x, y);
+          {
+            type = "woodenDoor";
+          }
           else if (building.Walls.ContainsKey(point))
-            AddPlace("woodenWall", x, y, new Dictionary<string, string>() { { "wallType", Path.GetFileName(building.Walls[point].TextureName) } });
-          else
-            AddPlace("woodenFloor", x, y);
+          {
+            type = "woodenWall";
+            additionalProperties.Add("wallType", Path.GetFileName(building.Walls[point].AdditionalProperties["wallType"].Value));
+          }
+
+          AddPlace(type, x, y, household.Id, additionalProperties);
         }
       }
 
-      GameWorld.Households.Add(household);
       return household;
+    }
+
+    public void InstabuildHousehold(Household household)
+    {
+      var places = GameWorld.Places.Where(c => c.HouseholdId == household.Id);
+      foreach(var place in places)
+      {
+        place.AdditionalProperties["construction%"].Value = "100";
+        _state.EditPlaceEntity(place);
+        RemoveTask("construct", place.Id);
+      }
     }
 
     private static string GetWallType(Point wall, List<Point> points)
@@ -424,7 +425,7 @@ namespace Others.Managers
       {
         string wallType = GetWallType(wall, points);
 
-        AddPlace("woodenWall", wall.X + startX, wall.Y + startY, new Dictionary<string, string>() { { "wallType", wallType } });
+        AddPlace("woodenWall", wall.X + startX, wall.Y + startY, additionalValues: new Dictionary<string, string>() { { "wallType", wallType } });
       }
     }
 
@@ -467,6 +468,9 @@ namespace Others.Managers
         if (GameWorld.Places[i].IsRemoved)
         {
           GameWorld.Places.RemoveAt(i);
+        } else
+        {
+          _state.EditPlaceEntity(GameWorld.Places[i]);
         }
       }
     }
@@ -574,12 +578,6 @@ namespace Others.Managers
           task.LoadFromSave(GameWorld.TaskData[task.Name]);//, task.Priority);
         }
 
-        foreach (var place in GameWorld.Places)
-        {
-          place.LoadFromSave((Place)GameWorld.PlaceData[place.Name].Clone());
-          _state.AddPlaceEntity(place);
-        }
-
         foreach (var villager in GameWorld.Villagers)
         {
           villager.Load(GameWorld);
@@ -589,6 +587,16 @@ namespace Others.Managers
         foreach (var household in GameWorld.Households)
         {
           household.Load(this);
+        }
+
+        foreach (var place in GameWorld.Places)
+        {
+          place.LoadFromSave((Place)GameWorld.PlaceData[place.Name].Clone());
+          if (place.HouseholdId > 0)
+          {
+            place.Household = GameWorld.Households.FirstOrDefault(c => c.Id == place.HouseholdId);
+          }
+          _state.AddPlaceEntity(place);
         }
       }
       else
@@ -605,11 +613,12 @@ namespace Others.Managers
     private void SetDefaultWorld()
     {
       var kyle = AddVillager("Kyle", new Point(0, 0), new Dictionary<string, float>() { { "mining", 1 }, { "chopping", 1 }, { "crafting", 1 }, { "gathering", 1 } });
-
-      var umneyHousehold = AddHousehold("Umney", new Rectangle(5, 3, 5, 5));
+      Building building = GetDefaultBuilding();
+      var umneyHousehold = AddHousehold("Umney", building);
       AddPlace("storageChest", 8, 4);
       AddPlace("singleBed", 6, 4);
       umneyHousehold.AssignVillager(kyle);
+      InstabuildHousehold(umneyHousehold);
       //AddVillager("Niall", new Dictionary<string, float>() { { "chopping", 1 } });
 
       //TestWalls(12, 2);
@@ -643,6 +652,55 @@ namespace Others.Managers
       //{
       //  AddTask("choppingNormalTree", 1, place.Id);
       //}
+    }
+
+    private Building GetDefaultBuilding()
+    {
+      var x = 5;
+      var y = 3;
+      var width = 5;
+      var height = 5;
+      var size = new Rectangle(x, y, width, height);
+
+      var result = new Dictionary<Point, Place>();
+      var points = new List<Point>();
+
+      for (int newY = size.Y; newY < size.Bottom; newY++)
+      {
+        for (int newX = size.X; newX < size.Right; newX++)
+        {
+          var addWall = newY == size.Y ||
+            newX == size.X ||
+            newY == (size.Bottom - 1) ||
+            newX == (size.Right - 1);
+
+          if (!addWall)
+            continue;
+
+          points.Add(new Point(newX, newY));
+        }
+      }
+
+      foreach (var point in points)
+      {
+        var wallType = GetWallType(point, points);
+
+        var place = (Models.Place)GameWorld.PlaceData["woodenWall"].Clone();
+        place.AdditionalProperties.Add("wallType", new AdditionalProperty() { IsVisible = false, Value = wallType });
+
+        result.Add(point, place);
+      }
+
+      var building = new Building()
+      {
+        Rectangle = new Rectangle(x * Game1.TileSize, y * Game1.TileSize, width * Game1.TileSize, height * Game1.TileSize),
+        Doors = new Dictionary<Point, Place>()
+        {
+          { new Point(x + (width/ 2) , (y + height) - 1), GameWorld.PlaceData["woodenDoor"] }
+        },
+        Walls = result,
+      };
+      return building;
     }
 
     /// <summary>

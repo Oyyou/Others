@@ -56,6 +56,9 @@ namespace Others.Models
     [JsonProperty("additionalProperties")]
     public Dictionary<string, AdditionalProperty> AdditionalProperties { get; set; } = new Dictionary<string, AdditionalProperty>();
 
+    [JsonProperty("resourceCost")]
+    public Dictionary<string, long> ResourceCost = new Dictionary<string, long>();
+
     public object Clone()
     {
       var newObj = (Place)this.MemberwiseClone();

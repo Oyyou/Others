@@ -23,7 +23,7 @@
     <MonoGameContentReference Include="Content\Content.mgcb" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ZonerEngine.GL\ZonerEngine.GL\ZonerEngine.GL.csproj" />
+    <ProjectReference Include="..\..\ZonerEngine.GL\ZonerEngine.GL\ZonerEngine.GL.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Data\Attributes\energy-attr.json">
@@ -48,6 +48,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Data\Tasks\choppingNormalTree-task.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Tasks\construct-task.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Data\Tasks\craftAxe-task.json">
@@ -81,4 +84,5 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
 </Project>

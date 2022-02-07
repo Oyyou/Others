@@ -272,7 +272,7 @@ namespace Others.Managers
         Finish();
       }
 
-      var mousePosition = new Point((int)Math.Floor(GameMouse.Position.X / (double)Game1.TileSize) * Game1.TileSize, (int)Math.Floor(GameMouse.Position.Y / (double)Game1.TileSize) * Game1.TileSize).ToVector2();
+      var mousePosition = new Point((int)Math.Floor(GameMouse.PositionWithCamera.X / (double)Game1.TileSize) * Game1.TileSize, (int)Math.Floor(GameMouse.PositionWithCamera.Y / (double)Game1.TileSize) * Game1.TileSize).ToVector2();
       _cursorEntity.Position = mousePosition;
 
 
@@ -403,7 +403,7 @@ namespace Others.Managers
       foreach (var wall in _building.Walls)
         wall.Value.Update(gameTime);
 
-      if (!GameMouse.Intersects(_currentRectangle))
+      if (!GameMouse.Intersects(_currentRectangle, true))
         return;
 
       if (GameMouse.IsLeftPressed)
@@ -451,7 +451,7 @@ namespace Others.Managers
       foreach (var door in _building.Doors)
         door.Value.Update(gameTime);
 
-      if (!GameMouse.Intersects(_currentRectangle))
+      if (!GameMouse.Intersects(_currentRectangle, true))
         return;
 
       if (GameMouse.IsLeftClicked)
@@ -459,6 +459,9 @@ namespace Others.Managers
 
         var key = (_cursorEntity.Position / 40).ToPoint();
         if (!_building.Walls.ContainsKey(key))
+          return;
+
+        if (_building.Doors.ContainsKey(key))
           return;
 
         var wall = _building.Walls[key];

@@ -380,6 +380,7 @@ namespace Others.States
 
     public override void Update(GameTime gameTime)
     {
+      GameMouse.AddCamera(_camera);
       _previousScroll = _currentScroll;
       _currentScroll = GameMouse.ScrollWheelValue;
 

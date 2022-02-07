@@ -146,7 +146,7 @@ namespace Others.Managers
     public void Update(GameTime gameTime)
     {
       PreviousMousePosition = CurrentMousePosition;
-      CurrentMousePosition = new Point((int)Math.Floor(GameMouse.Position.X / (double)Game1.TileSize), (int)Math.Floor(GameMouse.Position.Y / (double)Game1.TileSize));
+      CurrentMousePosition = new Point((int)Math.Floor(GameMouse.PositionWithCamera.X / (double)Game1.TileSize), (int)Math.Floor(GameMouse.PositionWithCamera.Y / (double)Game1.TileSize));
 
       if (PreviousMousePosition != CurrentMousePosition)
       {

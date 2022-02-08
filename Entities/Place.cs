@@ -55,6 +55,17 @@ namespace Others.Entities
 
     public bool IsHovering { get; set; } = false;
 
+    public override Rectangle ClickRectangle
+    {
+      get
+      {
+        var position = Position + PositionOffset;
+        var x = (int)position.X;
+        var y = (int)position.Y;
+        return new Rectangle(x, y, _texture.Width, _texture.Height);
+      }
+    }
+
     public Place(Models.PlaceWrapper place, Texture2D texture, BattleState state)
     {
       Wrapper = place;
@@ -128,6 +139,16 @@ namespace Others.Entities
           };
         }
       });
+    }
+
+    public void OnClick()
+    {
+      var household = Wrapper.Household;
+    }
+
+    public override string ToString()
+    {
+      return System.IO.Path.GetFileNameWithoutExtension(_texture.Name);
     }
   }
 }

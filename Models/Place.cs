@@ -59,6 +59,9 @@ namespace Others.Models
     [JsonProperty("resourceCost")]
     public Dictionary<string, long> ResourceCost = new Dictionary<string, long>();
 
+    [JsonIgnore]
+    public PlaceType PlaceType { get; set; }
+
     public object Clone()
     {
       var newObj = (Place)this.MemberwiseClone();

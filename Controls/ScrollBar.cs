@@ -27,7 +27,7 @@ namespace Others.Controls
 
     private int _previousScrollValue;
 
-    public override Rectangle Rectangle => new Rectangle((int)DrawPosition.X, (int)DrawPosition.Y, _backgroundTexture.Width, _backgroundTexture.Height);
+    public override Rectangle ClickRectangle => new Rectangle((int)DrawPosition.X, (int)DrawPosition.Y, _backgroundTexture.Width, _backgroundTexture.Height);
 
     public ScrollBar(GraphicsDevice graphicsDevice, SpriteFont font, int height)
     {
@@ -48,7 +48,7 @@ namespace Others.Controls
       _topButton = new Button(upTexture) { Position = new Vector2(2, 2), OnClicked = (self) => SetBarButtonY(_thumbButton.Position.Y - _speed) };
       _bottomButton = new Button(downTexture) { Position = new Vector2(2, height - (_backgroundTexture.Width - 2)), OnClicked = (self) => SetBarButtonY(_thumbButton.Position.Y + _speed) };
 
-      _min = _topButton.Rectangle.Bottom + 2;
+      _min = _topButton.ClickRectangle.Bottom + 2;
       _max = _bottomButton.Position.Y - 2 - barTexture.Height;
 
       _thumbButton = new Button(barTexture) { Position = new Vector2(2, _min), OnHeld = Bar_OnHeld };
@@ -60,28 +60,28 @@ namespace Others.Controls
 
     public void SetRectangle(Rectangle rectangle)
     {
-      if (rectangle.Height < this.Parent.Rectangle.Height)
+      if (rectangle.Height < this.Parent.ClickRectangle.Height)
       {
         IsVisible = false;
         return;
       }
 
-      var area = (_bottomButton.Rectangle.Top - 2f) - (_topButton.Rectangle.Bottom + 2f);
+      var area = (_bottomButton.ClickRectangle.Top - 2f) - (_topButton.ClickRectangle.Bottom + 2f);
       var ratio = (area / rectangle.Height);
       var size = (int)(area * ratio);
       var rationReverse = (area * (1 - ratio));
 
       _speed = 10f;
 
-      var a = (float)this.Parent.Rectangle.Height / (float)rectangle.Height;
-      var b = (this.Parent.Rectangle.Height * (1 - a));
-      var c = (float)rectangle.Height - (float)this.Parent.Rectangle.Height;
+      var a = (float)this.Parent.ClickRectangle.Height / (float)rectangle.Height;
+      var b = (this.Parent.ClickRectangle.Height * (1 - a));
+      var c = (float)rectangle.Height - (float)this.Parent.ClickRectangle.Height;
       _remaining = c / (rationReverse / _speed);
 
       var barTexture = new Texture2D(_graphicsDevice, _backgroundTexture.Width - 4, size);
       barTexture.SetData(Helpers.GetBorder(barTexture, 1, Color.Black, Color.Gray));
 
-      _min = (_topButton.Position.Y + _topButton.Rectangle.Height) + 2;
+      _min = (_topButton.Position.Y + _topButton.ClickRectangle.Height) + 2;
       _max = _bottomButton.Position.Y - 2 - barTexture.Height;
 
       RemoveChild(_thumbButton);
@@ -95,7 +95,7 @@ namespace Others.Controls
     {
       var position = MousePosition - this.DrawPosition;
 
-      SetBarButtonY(position.Y - (_thumbButton.Rectangle.Height / 2));
+      SetBarButtonY(position.Y - (_thumbButton.ClickRectangle.Height / 2));
     }
 
     private void SetBarButtonY(float y)
@@ -122,7 +122,7 @@ namespace Others.Controls
 
     private void Scroll()
     {
-      if (!MouseRectangle.Intersects(this.Parent.Rectangle))
+      if (!MouseRectangle.Intersects(this.Parent.ClickRectangle))
       {
         _previousScrollValue = GameMouse.ScrollWheelValue;
         return;

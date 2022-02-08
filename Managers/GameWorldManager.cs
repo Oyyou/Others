@@ -150,6 +150,12 @@ namespace Others.Managers
         place.Household = GameWorld.Households.FirstOrDefault(c => c.Id == place.HouseholdId);
       }
 
+      if (additionalValues == null)
+        additionalValues = new Dictionary<string, string>();
+
+      if (place.Data.PlaceType.IsConstructable)
+        additionalValues.Add("construction%", "0");
+
       if (additionalValues != null)
       {
         foreach (var value in additionalValues)
@@ -161,7 +167,7 @@ namespace Others.Managers
         }
       }
 
-      if(place.AdditionalProperties.ContainsKey("construction%"))
+      if (place.AdditionalProperties.ContainsKey("construction%"))
       {
         AddTask("construct", 1, place.Id);
       }
@@ -230,6 +236,7 @@ namespace Others.Managers
         Id = GetId("household"),
         Name = name,
       };
+      household.Load(this);
       GameWorld.Households.Add(household);
 
       var size = building.Rectangle.Divide(Game1.TileSize);
@@ -241,7 +248,6 @@ namespace Others.Managers
           var point = new Point(x, y);
           string type = "woodenFloor";
           var additionalProperties = new Dictionary<string, string>();
-          additionalProperties.Add("construction%", "0");
 
           if (building.Doors.ContainsKey(point))
           {
@@ -253,7 +259,7 @@ namespace Others.Managers
             additionalProperties.Add("wallType", Path.GetFileName(building.Walls[point].AdditionalProperties["wallType"].Value));
           }
 
-          AddPlace(type, x, y, household.Id, additionalProperties);
+          household.AddPlace(type, x, y, additionalProperties);
         }
       }
 
@@ -263,9 +269,11 @@ namespace Others.Managers
     public void InstabuildHousehold(Household household)
     {
       var places = GameWorld.Places.Where(c => c.HouseholdId == household.Id);
-      foreach(var place in places)
+      foreach (var place in places)
       {
-        place.AdditionalProperties["construction%"].Value = "100";
+        if (place.Data.PlaceType.IsConstructable)
+          place.AdditionalProperties["construction%"].Value = "100";
+
         _state.EditPlaceEntity(place);
         RemoveTask("construct", place.Id);
       }
@@ -468,7 +476,8 @@ namespace Others.Managers
         if (GameWorld.Places[i].IsRemoved)
         {
           GameWorld.Places.RemoveAt(i);
-        } else
+        }
+        else
         {
           _state.EditPlaceEntity(GameWorld.Places[i]);
         }
@@ -615,43 +624,22 @@ namespace Others.Managers
       var kyle = AddVillager("Kyle", new Point(0, 0), new Dictionary<string, float>() { { "mining", 1 }, { "chopping", 1 }, { "crafting", 1 }, { "gathering", 1 } });
       Building building = GetDefaultBuilding();
       var umneyHousehold = AddHousehold("Umney", building);
-      AddPlace("storageChest", 8, 4);
-      AddPlace("singleBed", 6, 4);
-      umneyHousehold.AssignVillager(kyle);
-      InstabuildHousehold(umneyHousehold);
-      //AddVillager("Niall", new Dictionary<string, float>() { { "chopping", 1 } });
+      umneyHousehold.AddPlace("storageChest", 8, 4);
+      umneyHousehold.AddPlace("singleBed", 6, 4);
+      umneyHousehold.AddPlace("craftingBench", 8, 6);
 
-      //TestWalls(12, 2);
+      umneyHousehold.AssignVillager(kyle);
+      //InstabuildHousehold(umneyHousehold);
 
       AddPlace("goldOre", 1, 1);
-      //AddPlace("goldOre", 2, 1);
-      //AddPlace("goldOre", 4, 4);
-      //AddPlace("goldOre", 5, 3);
-      //AddPlace("goldOre", 5, 1);
-      //AddPlace("goldOre", 5, 6);
-      //AddPlace("goldOre", 7, 2);
-      //AddPlace("goldOre", 10, 4);
-      //AddPlace("goldOre", 5, 8);
-      //AddPlace("goldOre", 1, 4);
-      //AddPlace("goldOre", 2, 2);
-
-      AddPlace("craftingBench", 3, 5);
-
       AddPlace("rocks", 1, 2);
-
       AddPlace("sticks", 1, 3);
-
       AddPlace("normalTree", 3, 1);
 
       foreach (var place in GameWorld.Places.Where(c => c.Data.Skill == "mining"))
       {
         AddTask("miningGold", 1, place.Id);
       }
-
-      //foreach (var place in GameWorld.Places.Where(c => c.Place.Skill == "chopping"))
-      //{
-      //  AddTask("choppingNormalTree", 1, place.Id);
-      //}
     }
 
     private Building GetDefaultBuilding()
@@ -750,6 +738,18 @@ namespace Others.Managers
         }
       }
 
+      var placeFilesFiles = Directory.GetFiles("Data/", "placeTypes.json");
+
+      foreach (var placeFile in placeFilesFiles)
+      {
+        using (var r = new StreamReader(placeFile))
+        {
+          string json = r.ReadToEnd();
+          var places = JsonConvert.DeserializeObject<dynamic>(json);
+          GameWorld.PlaceTypeDate = ((object)places["placeTypes"]).ToDictionary<string, PlaceType>();
+        }
+      }
+
       var placeFiles = Directory.GetFiles("Data/", "places.json");
 
       foreach (var placeFile in placeFiles)
@@ -761,6 +761,15 @@ namespace Others.Managers
 
           foreach (var place in places.ListOfPlaces)
           {
+            try
+            {
+              place.PlaceType = GameWorld.PlaceTypeDate[place.Type];
+            }
+            catch
+            {
+              throw new ApplicationException($"Place type '{place.Type}' hasn't been added to 'placeTypes.json'");
+            }
+
             GameWorld.PlaceData.Add(place.Name, place);
           }
         }

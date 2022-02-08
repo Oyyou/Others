@@ -1,14 +1,37 @@
 {
-  "values": [
-    "Collection",
-    "Sleeping",
-    "Idle",
-    "Storage",
-    "Production",
-    "Gathering",
-    "Household",
-    "Wall",
-    "Door",
-    "Floor"
-  ]
+  "placeTypes": {
+    "Collection": {
+      "isConstructable": false
+    },
+    "Sleeping": {
+      "isConstructable": true
+    },
+    "Crafting": {
+      "isConstructable": true
+    },
+    "Idle": {
+      "isConstructable": false
+    },
+    "Storage": {
+      "isConstructable": true
+    },
+    "Production": {
+      "isConstructable": false
+    },
+    "Gathering": {
+      "isConstructable": false
+    },
+    "Household": {
+      "isConstructable": false
+    },
+    "Wall": {
+      "isConstructable": true
+    },
+    "Door": {
+      "isConstructable": true
+    },
+    "Floor": {
+      "isConstructable": true
+    }
+  }
 }

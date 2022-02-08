@@ -22,7 +22,7 @@ namespace Others.Controls
       }
     }
 
-    public override Rectangle Rectangle => new Rectangle((int)DrawPosition.X, (int)DrawPosition.Y, _texture.Width, _texture.Height);
+    public override Rectangle ClickRectangle => new Rectangle((int)DrawPosition.X, (int)DrawPosition.Y, _texture.Width, _texture.Height);
 
     public Button(Texture2D texture) : this(texture, null, "")
     {

@@ -14,7 +14,10 @@ namespace Others.Models
 
     [JsonIgnore]
     public Dictionary<string, Task> TaskData { get; set; } = new Dictionary<string, Task>();
-    
+
+    [JsonIgnore]
+    public Dictionary<string, PlaceType> PlaceTypeDate { get; set; } = new Dictionary<string, PlaceType>();
+
     [JsonIgnore]
     public Dictionary<string, Place> PlaceData { get; set; } = new Dictionary<string, Place>();
     

@@ -10,6 +10,8 @@ namespace Others.Models
 {
   public class Household
   {
+    private GameWorldManager _gwm;
+
     [JsonProperty("id")]
     public long Id { get; set; }
 
@@ -27,7 +29,8 @@ namespace Others.Models
 
     public void Load(GameWorldManager gwm)
     {
-      Villagers = VillagerIds.Select(c => gwm.GetVillagerById(c)).ToList();
+      _gwm = gwm;
+      Villagers = VillagerIds.Select(c => _gwm.GetVillagerById(c)).ToList();
     }
 
     public void AssignVillager(Villager villager)
@@ -41,6 +44,11 @@ namespace Others.Models
 
       villager.HouseholdId = this.Id;
       villager.Household = this;
+    }
+
+    public void AddPlace(string placeName, int x, int y, Dictionary<string, string> additionalValues = null)
+    {
+      _gwm.AddPlace(placeName, x, y, this.Id, additionalValues);
     }
   }
 }

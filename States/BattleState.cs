@@ -7,9 +7,7 @@ using Others.Entities;
 using Others.Managers;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using ZonerEngine.GL;
 using ZonerEngine.GL.Components;
 using ZonerEngine.GL.Entities;
@@ -153,7 +151,7 @@ namespace Others.States
 
       foreach (var control in subMenu)
       {
-        control.Position = new Vector2(0, -control.Rectangle.Height);
+        control.Position = new Vector2(0, -control.ClickRectangle.Height);
         control.IsVisible = false;
         panel.AddChild(control);
       }
@@ -179,18 +177,18 @@ namespace Others.States
         var rectangle = new Rectangle(0, 0, 10, 10);
         foreach (var child in children)
         {
-          if (child.Rectangle.X < rectangle.X)
-            rectangle = new Rectangle(child.Rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
+          if (child.ClickRectangle.X < rectangle.X)
+            rectangle = new Rectangle(child.ClickRectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
 
-          if (child.Rectangle.Y < rectangle.Y)
-            rectangle = new Rectangle(rectangle.X, child.Rectangle.Y, rectangle.Width, rectangle.Height);
+          if (child.ClickRectangle.Y < rectangle.Y)
+            rectangle = new Rectangle(rectangle.X, child.ClickRectangle.Y, rectangle.Width, rectangle.Height);
 
-          if (child.Rectangle.Right > rectangle.Right)
-            rectangle = new Rectangle(rectangle.X, rectangle.Y, child.Rectangle.Right - rectangle.X, rectangle.Height);
+          if (child.ClickRectangle.Right > rectangle.Right)
+            rectangle = new Rectangle(rectangle.X, rectangle.Y, child.ClickRectangle.Right - rectangle.X, rectangle.Height);
 
 
-          if (child.Rectangle.Bottom > rectangle.Bottom)
-            rectangle = new Rectangle(rectangle.X, rectangle.Y, rectangle.Width, child.Rectangle.Bottom - rectangle.Y);
+          if (child.ClickRectangle.Bottom > rectangle.Bottom)
+            rectangle = new Rectangle(rectangle.X, rectangle.Y, rectangle.Width, child.ClickRectangle.Bottom - rectangle.Y);
         }
 
         rectangle.Height += 10; // Padding :)
@@ -231,17 +229,17 @@ namespace Others.States
         var rectangle = new Rectangle(0, 0, 10, 10);
         foreach (var child in children)
         {
-          if (child.Rectangle.X < rectangle.X)
-            rectangle = new Rectangle(child.Rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
+          if (child.ClickRectangle.X < rectangle.X)
+            rectangle = new Rectangle(child.ClickRectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
 
-          if (child.Rectangle.Y < rectangle.Y)
-            rectangle = new Rectangle(rectangle.X, child.Rectangle.Y, rectangle.Width, rectangle.Height);
+          if (child.ClickRectangle.Y < rectangle.Y)
+            rectangle = new Rectangle(rectangle.X, child.ClickRectangle.Y, rectangle.Width, rectangle.Height);
 
-          if (child.Rectangle.Right > rectangle.Right)
-            rectangle = new Rectangle(rectangle.X, rectangle.Y, child.Rectangle.Right - rectangle.X, rectangle.Height);
+          if (child.ClickRectangle.Right > rectangle.Right)
+            rectangle = new Rectangle(rectangle.X, rectangle.Y, child.ClickRectangle.Right - rectangle.X, rectangle.Height);
 
-          if (child.Rectangle.Bottom > rectangle.Bottom)
-            rectangle = new Rectangle(rectangle.X, rectangle.Y, rectangle.Width, child.Rectangle.Bottom - rectangle.Y);
+          if (child.ClickRectangle.Bottom > rectangle.Bottom)
+            rectangle = new Rectangle(rectangle.X, rectangle.Y, rectangle.Width, child.ClickRectangle.Bottom - rectangle.Y);
         }
 
         rectangle.Height += 10; // Padding :)
@@ -404,6 +402,7 @@ namespace Others.States
     public override void Update(GameTime gameTime)
     {
       GameMouse.AddCamera(_camera);
+
       _previousScroll = _currentScroll;
       _currentScroll = GameMouse.ScrollWheelValue;
 
@@ -414,10 +413,10 @@ namespace Others.States
       else if (_currentScroll > _previousScroll)
       {
         _scale += 0.01f;
-
       }
 
       _scale = MathHelper.Clamp(_scale, 0.5f, 1f);
+
       _camera = Matrix.CreateTranslation(0, 0, 0) * Matrix.CreateScale(_scale);
 
       if (GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.G))
@@ -467,6 +466,23 @@ namespace Others.States
           i--;
         }
       }
+
+
+
+      if (GameMouse.IsLeftClicked)
+      {
+        var obj = GameMouse.ValidObject;
+
+        switch (obj)
+        {
+          case Place place:
+            place.OnClick();
+
+            break;
+          default:
+            break;
+        }
+      }
     }
 
     public override void Draw(GameTime gameTime)
@@ -483,6 +499,7 @@ namespace Others.States
           {
             draw = false;
             _underConstruction.Position = entity.Position;
+            _underConstruction.Layer = entity.Layer + 0.001f;
             _underConstruction.Draw(gameTime, _spriteBatch);
           }
         }

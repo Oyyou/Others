@@ -12,7 +12,7 @@ namespace Others.Controls
 
     public string Text { get; set; }
 
-    public override Rectangle Rectangle => new Rectangle((int)DrawPosition.X, (int)DrawPosition.Y, (int)_font.MeasureString(Text).X, (int)_font.MeasureString(Text).Y);
+    public override Rectangle ClickRectangle => new Rectangle((int)DrawPosition.X, (int)DrawPosition.Y, (int)_font.MeasureString(Text).X, (int)_font.MeasureString(Text).Y);
 
     public Label(SpriteFont font, string text) : base()
     {
@@ -25,7 +25,7 @@ namespace Others.Controls
       if (Parent == null)
         return;
 
-      UpdatePosition(Parent.Rectangle);
+      UpdatePosition(Parent.ClickRectangle);
     }
 
     public void UpdatePosition(Rectangle rectangle)

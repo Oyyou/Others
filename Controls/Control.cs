@@ -47,6 +47,8 @@ namespace Others.Controls
 
     public float ClickLayer => DrawLayer;
 
+    public abstract Rectangle ClickRectangle { get; }// => new Rectangle((int)DrawPosition.X, (int)DrawPosition.Y, 10, 10);// _texture.Width, _texture.Height); // TODO: Fix
+
     public Vector2 ChildrenOffset = Vector2.Zero;
 
     public Rectangle Viewport = new Rectangle(0, 0, ZonerGame.ScreenWidth, ZonerGame.ScreenHeight);
@@ -85,8 +87,6 @@ namespace Others.Controls
         return new Rectangle((int)MousePosition.X, (int)MousePosition.Y, 1, 1);
       }
     }
-
-    public abstract Rectangle Rectangle { get; }// => new Rectangle((int)DrawPosition.X, (int)DrawPosition.Y, 10, 10);// _texture.Width, _texture.Height); // TODO: Fix
 
     public bool IsMouseOver { get; protected set; } = false;
 
@@ -150,7 +150,7 @@ namespace Others.Controls
       IsMouseDown = false;
       IsMouseClicked = false;
 
-      if (MouseRectangle.Intersects(Rectangle))
+      if (MouseRectangle.Intersects(ClickRectangle))
       {
         GameMouse.AddObject(this);
 

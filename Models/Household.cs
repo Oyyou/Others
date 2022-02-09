@@ -24,6 +24,9 @@ namespace Others.Models
     [JsonProperty("name")]
     public string Name { get; set; }
 
+    [JsonProperty("rectangle")]
+    public Rectangle Rectangle { get; set; }
+
     [JsonIgnore]
     public List<Villager> Villagers { get; set; } = new List<Villager>();
 
@@ -48,7 +51,7 @@ namespace Others.Models
 
     public void AddPlace(string placeName, int x, int y, Dictionary<string, string> additionalValues = null)
     {
-      _gwm.AddPlace(placeName, x, y, this.Id, additionalValues);
+      _gwm.AddPlace(placeName, Rectangle.X + x, Rectangle.Y + y, this.Id, additionalValues);
     }
   }
 }

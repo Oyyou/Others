@@ -39,7 +39,7 @@ namespace Others.Entities
 
     public override void LoadContent()
     {
-      AddComponent(new TextureComponent(this, _texture));
+      AddComponent(new TextureComponent(this, _texture) { GetLayer = () => { var value = (Layer / 1000f); return Layer; } });
     }
   }
 }

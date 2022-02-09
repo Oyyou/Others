@@ -93,8 +93,8 @@ namespace Others.Entities
     public override void LoadContent()
     {
       var origin = new Vector2(_texture.Width / 2, _texture.Height / 2);
-
-      AddComponent(new TextureComponent(this, _texture) { Layer = (Layer + (Position + origin).Y / 1000f), PositionOffset = PositionOffset, Colour = Colour });
+      Layer = Layer + ((Position + origin).Y / 1000f);
+      AddComponent(new TextureComponent(this, _texture) { Layer = Layer, PositionOffset = PositionOffset, Colour = Colour });
       if (Wrapper.Data.CollisionType == Models.Place.CollisionTypes.Full)
         AddComponent(new TextureComponent(this, _collisionTexture, () => _state.ShowCollisionBox) { Layer = 0.96f, });
       AddComponent(new TextureComponent(this, _hoveringTexture, () => IsHovering) { Layer = 0.961f, });

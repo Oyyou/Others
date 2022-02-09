@@ -235,17 +235,18 @@ namespace Others.Managers
       {
         Id = GetId("household"),
         Name = name,
+        Rectangle = building.Rectangle.Divide(Game1.TileSize),
       };
       household.Load(this);
       GameWorld.Households.Add(household);
 
-      var size = building.Rectangle.Divide(Game1.TileSize);
+      var size = household.Rectangle;
 
-      for (int y = size.Y; y < size.Bottom; y++)
+      for (int y = 0; y < size.Height; y++)
       {
-        for (int x = size.X; x < size.Right; x++)
+        for (int x = 0; x < size.Width; x++)
         {
-          var point = new Point(x, y);
+          var point = new Point(x + size.X, y + size.Y);
           string type = "woodenFloor";
           var additionalProperties = new Dictionary<string, string>();
 
@@ -624,12 +625,12 @@ namespace Others.Managers
       var kyle = AddVillager("Kyle", new Point(0, 0), new Dictionary<string, float>() { { "mining", 1 }, { "chopping", 1 }, { "crafting", 1 }, { "gathering", 1 } });
       Building building = GetDefaultBuilding();
       var umneyHousehold = AddHousehold("Umney", building);
-      umneyHousehold.AddPlace("storageChest", 8, 4);
-      umneyHousehold.AddPlace("singleBed", 6, 4);
-      umneyHousehold.AddPlace("craftingBench", 8, 6);
+      umneyHousehold.AddPlace("singleBed", 1, 1);
+      umneyHousehold.AddPlace("storageChest", 3, 1);
+      umneyHousehold.AddPlace("craftingBench", 3, 3);
 
       umneyHousehold.AssignVillager(kyle);
-      //InstabuildHousehold(umneyHousehold);
+      InstabuildHousehold(umneyHousehold);
 
       AddPlace("goldOre", 1, 1);
       AddPlace("rocks", 1, 2);

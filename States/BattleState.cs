@@ -90,7 +90,11 @@ namespace Others.States
       _hbm = new HouseBuildingManager(GameModel, _gwm, Map, _camera)
       {
         OnCancel = () => State = States.Playing,
-        OnFinish = (Models.Building building) => _gwm.AddHousehold("", building),
+        OnFinish = (Models.Building building) =>
+        {
+          _gwm.AddHousehold("", building);
+         //  Map.WriteMap();
+        },
       };
 
       _underConstruction = new Basic(_content.Load<Texture2D>("Places/Construction"), new Vector2(0, 0));
@@ -112,6 +116,7 @@ namespace Others.States
         //GetBuildingItemsPanel(),
       };
       #endregion
+      // Map.WriteMap();
     }
 
     /// <summary>
@@ -324,9 +329,25 @@ namespace Others.States
     {
       entity.LoadContent();
 
+      Func<bool> canAdd = null;
+
+      if (entity.AdditionalProperties.ContainsKey("construction%"))
+      {
+        if (entity.AdditionalProperties["construction%"] != "100")
+        {
+          canAdd = () =>
+          {
+            if (entity.AdditionalProperties["construction%"] == "100")
+              return true;
+
+            return false;
+          };
+        }
+      }
+
       var mappedComponent = entity.GetComponent<MappedComponent>();
       if (mappedComponent != null)
-        Map.Add(mappedComponent);
+        Map.Add(mappedComponent, canAdd);
 
       _entities.Add(entity);
     }
@@ -430,6 +451,8 @@ namespace Others.States
 
       if (GameKeyboard.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.S))
         _gwm.Save("save.json");
+
+      Map.Update();
 
       foreach (var control in _controls)
       {

@@ -310,7 +310,10 @@ namespace Others.Managers
         Finish();
       }
 
-      var mousePosition = new Point((int)Math.Floor(GameMouse.PositionWithCamera.X / (double)Game1.TileSize) * Game1.TileSize, (int)Math.Floor(GameMouse.PositionWithCamera.Y / (double)Game1.TileSize) * Game1.TileSize).ToVector2();
+      var mousePosition = new Point(
+        (int)Math.Floor(GameMouse.PositionWithCamera.X / (double)Game1.TileSize) * Game1.TileSize,
+        (int)Math.Floor(GameMouse.PositionWithCamera.Y / (double)Game1.TileSize) * Game1.TileSize
+      ).ToVector2();
       _cursorEntity.Position = mousePosition;
 
 
@@ -338,7 +341,7 @@ namespace Others.Managers
     {
       _walls = new List<Wall>();
       _doors = new List<Basic>();
-      foreach(var wall in _building.Walls.Where(c => !hasDoor(c)))
+      foreach (var wall in _building.Walls.Where(c => !hasDoor(c)))
       {
         var type = wall.Value.AdditionalProperties["wallType"].Value;
 
@@ -348,7 +351,7 @@ namespace Others.Managers
         _walls.Add(wallEntity);
       }
 
-      foreach(var door in _building.Doors)
+      foreach (var door in _building.Doors)
       {
         var doorEntity = new Basic(_gameModel.Content.Load<Texture2D>($"Places/woodenDoor"), door.Key.Multiply(Game1.TileSize).ToVector2());
         doorEntity.LoadContent();

@@ -258,6 +258,7 @@ namespace Others.Models
       var task = new TaskWrapper();
       var idleLocation = gwm.AddPlace("idleSpot", MapPoint); // TODO: Set x/y to current position
       task.PlaceId = idleLocation.Id;
+      task.Priority = -1;
       task.LoadFromData(taskData);
 
       Tasks.Insert(0, task);
@@ -326,7 +327,7 @@ namespace Others.Models
         //GoToPlace(craftingLocations.FirstOrDefault(c => c.Name == task.Name));
         AddToInventory(gwm, producedItem);
         CurrentTask = null;
-      
+
       }
       else
       {

@@ -20,7 +20,7 @@ namespace Others.Models
     public TaskStatus Status;
 
     [JsonProperty("priority")]
-    public byte Priority;
+    public int Priority;
 
     [JsonIgnore]
     public Task Data { get; private set; }

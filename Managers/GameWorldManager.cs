@@ -64,65 +64,6 @@ namespace Others.Managers
       GameWorld.Tasks.Remove(task);
     }
 
-    public bool AssignTask(TaskWrapper task)
-    {
-      var requiredSkills = task.Data.SkillRequirements;
-      List<Villager> capableVillagers = new List<Villager>();
-      foreach (var villager in GameWorld.Villagers)
-      {
-        bool isValid = true;
-
-        foreach (var skill in requiredSkills)
-        {
-          if (villager.Skills == null)
-          {
-            isValid = false;
-            break;
-          }
-          if (!villager.Skills.ContainsKey(skill.Name))
-          {
-            isValid = false;
-            break;
-          }
-
-          if (villager.Skills[skill.Name] < skill.Level)
-          {
-            isValid = false;
-            break;
-          }
-        }
-        if (isValid)
-        {
-          capableVillagers.Add(villager);
-        }
-      }
-      if (capableVillagers.Count == 0)
-      {
-        Console.WriteLine($"No capable villagers for this task {task.Name}");
-        return false;
-      }
-      if (capableVillagers.Count == 1)
-      {
-        capableVillagers[0].Tasks.Add(task);
-        Console.WriteLine($"{task.Name} has been assigned to {capableVillagers[0].Name}");
-
-        return true;
-      }
-      if (capableVillagers.Count > 1)
-      {
-        foreach (var villager in capableVillagers)
-        {
-          if (villager.Tasks.Count == 0)
-          {
-            villager.Tasks.Add(task);
-
-            return true;
-          }
-        }
-      }
-      return false;
-    }
-
     /// <summary>
     /// 
     /// </summary>
@@ -461,7 +402,7 @@ namespace Others.Managers
 
     public void Update(GameTime gameTime)
     {
-      AssignTasks();
+      AutoAssignTasks();
 
       UpdateVillager();
 
@@ -526,17 +467,30 @@ namespace Others.Managers
                       c => c.Id == id);
     }
 
-    private void AssignTasks()
+    private void AutoAssignTasks()
     {
-      for (int i = 0; i < GameWorld.Tasks.Count; i++)
+      foreach (var villager in GameWorld.Villagers)
       {
-        var hasAssigned = AssignTask(GameWorld.Tasks[i]);
+        // Don't give a villager with work more work
+        if (villager.Tasks.Count(task => task.Priority >= 0) > 0)
+          continue;
 
-        if (hasAssigned)
-        {
-          GameWorld.Tasks.RemoveAt(i);
-          i--;
-        }
+        var orderedTasks = GameWorld.Tasks
+          .Where(task => task.Data.SkillRequirements.Count == 0 || task.Data.SkillRequirements.Any(skill => villager.Skills.ContainsKey(skill.Name) && villager.Skills[skill.Name] >= skill.Level))
+          .OrderBy(task => task.Priority)
+          .ThenBy(task =>
+          {
+            var place = GameWorld.Places.FirstOrDefault(c => c.Id == task.PlaceId);
+            return Vector2.Distance(villager.MapPoint.ToVector2(), place.Point.ToVector2());
+          });
+
+        var task = orderedTasks.FirstOrDefault();
+
+        if (task == null)
+          continue;
+
+        villager.Tasks.Add(task);
+        GameWorld.Tasks.Remove(task);
       }
     }
 

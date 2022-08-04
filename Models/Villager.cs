@@ -544,5 +544,10 @@ namespace Others.Models
 
       household.AssignVillager(this);
     }
+
+    public override string ToString()
+    {
+      return $"{Id}: {Name} {Household.Name}";
+    }
   }
 }

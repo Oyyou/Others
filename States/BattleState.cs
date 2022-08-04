@@ -54,6 +54,8 @@ namespace Others.States
 
     public Pathfinder Pathfinder { get; private set; }
 
+    public InfoButton InfoButton { get; private set; }
+
 
     public States State { get; private set; } = States.Playing;
 
@@ -93,7 +95,7 @@ namespace Others.States
         OnFinish = (Models.Building building) =>
         {
           _gwm.AddHousehold("", building);
-         //  Map.WriteMap();
+          //  Map.WriteMap();
         },
       };
 
@@ -105,9 +107,13 @@ namespace Others.States
 
       #region GUI Stuff
 
+      InfoButton = new InfoButton(_content.Load<Texture2D>("GUI/InfoButton"));
+      InfoButton.AddTag("Playing");
+
       _controls = new List<Control>()
       {
         GetControlsPanel(),
+        InfoButton,
         //GetBuildingItemsPanel(),
       };
 
@@ -171,38 +177,40 @@ namespace Others.States
       var font = _content.Load<SpriteFont>("Font");
       var buttonTexture = _content.Load<Texture2D>("GUI/Button");
 
-      var panel = new Panel(panelTexture, new Vector2(0, 0));
-      panel.Viewport = new Rectangle(0, (ZonerGame.ScreenHeight - 100) - panelTexture.Height, panelTexture.Width, panelTexture.Height);
-      panel.OnAddChild = (panel) =>
+      var panel = new Panel(panelTexture, new Vector2(0, 0))
       {
-        var children = panel.Children.Where(c => !c.IsFixedPosition);
-        if (children.Count() == 0)
-          return;
-
-        var rectangle = new Rectangle(0, 0, 10, 10);
-        foreach (var child in children)
+        Viewport = new Rectangle(0, (ZonerGame.ScreenHeight - 100) - panelTexture.Height, panelTexture.Width, panelTexture.Height),
+        OnAddChild = (panel) =>
         {
-          if (child.ClickRectangle.X < rectangle.X)
-            rectangle = new Rectangle(child.ClickRectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
+          var children = panel.Children.Where(c => !c.IsFixedPosition);
+          if (children.Count() == 0)
+            return;
 
-          if (child.ClickRectangle.Y < rectangle.Y)
-            rectangle = new Rectangle(rectangle.X, child.ClickRectangle.Y, rectangle.Width, rectangle.Height);
+          var rectangle = new Rectangle(0, 0, 10, 10);
+          foreach (var child in children)
+          {
+            if (child.ClickRectangle.X < rectangle.X)
+              rectangle = new Rectangle(child.ClickRectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
 
-          if (child.ClickRectangle.Right > rectangle.Right)
-            rectangle = new Rectangle(rectangle.X, rectangle.Y, child.ClickRectangle.Right - rectangle.X, rectangle.Height);
+            if (child.ClickRectangle.Y < rectangle.Y)
+              rectangle = new Rectangle(rectangle.X, child.ClickRectangle.Y, rectangle.Width, rectangle.Height);
+
+            if (child.ClickRectangle.Right > rectangle.Right)
+              rectangle = new Rectangle(rectangle.X, rectangle.Y, child.ClickRectangle.Right - rectangle.X, rectangle.Height);
 
 
-          if (child.ClickRectangle.Bottom > rectangle.Bottom)
-            rectangle = new Rectangle(rectangle.X, rectangle.Y, rectangle.Width, child.ClickRectangle.Bottom - rectangle.Y);
-        }
+            if (child.ClickRectangle.Bottom > rectangle.Bottom)
+              rectangle = new Rectangle(rectangle.X, rectangle.Y, rectangle.Width, child.ClickRectangle.Bottom - rectangle.Y);
+          }
 
-        rectangle.Height += 10; // Padding :)
+          rectangle.Height += 10; // Padding :)
 
-        var scrollBar = (ScrollBar)panel.Children.Where(c => c is ScrollBar).FirstOrDefault();
-        if (scrollBar != null)
-        {
-          scrollBar.SetRectangle(rectangle);
-        }
+          var scrollBar = (ScrollBar)panel.Children.Where(c => c is ScrollBar).FirstOrDefault();
+          if (scrollBar != null)
+          {
+            scrollBar.SetRectangle(rectangle);
+          }
+        },
       };
 
       //var craftingLocations = _gwm.GameWorld.Places.Where(c => c.Data.Type == "Crafting");

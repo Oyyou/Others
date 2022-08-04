@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ZonerEngine.GL;
+using ZonerEngine.GL.Input;
 
 namespace Others.Models
 {
@@ -52,6 +54,20 @@ namespace Others.Models
     public void AddPlace(string placeName, int x, int y, Dictionary<string, string> additionalValues = null)
     {
       _gwm.AddPlace(placeName, Rectangle.X + x, Rectangle.Y + y, this.Id, additionalValues);
+    }
+
+    public void Update(GameTime gameTime)
+    {
+      var rect = Rectangle.Multiply(Game1.TileSize);
+      if (GameMouse.RectangleWithCamera.Intersects(rect))
+      {
+        _gwm.State.InfoButton.Set(rect);
+      }
+    }
+
+    public override string ToString()
+    {
+      return $"{Id}: {Name}";
     }
   }
 }

@@ -41,5 +41,10 @@ namespace Others.Models
     {
       Data = task;
     }
+
+    public override string ToString()
+    {
+      return Name;
+    }
   }
 }

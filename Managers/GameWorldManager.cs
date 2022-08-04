@@ -14,7 +14,7 @@ namespace Others.Managers
 {
   public class GameWorldManager
   {
-    private BattleState _state;
+    public readonly BattleState State;
 
     private GatherableResourcesManager _grm;
 
@@ -28,8 +28,8 @@ namespace Others.Managers
 
     public GameWorldManager(BattleState state)
     {
-      _state = state;
-      Pathfinder = new Pathfinder(_state.Map);
+      State = state;
+      Pathfinder = new Pathfinder(State.Map);
     }
 
     public int GetId(string dataType)
@@ -115,7 +115,7 @@ namespace Others.Managers
 
       GameWorld.Places.Add(place);
 
-      _state.AddPlaceEntity(place);
+      State.AddPlaceEntity(place);
 
       return place;
     }
@@ -133,7 +133,7 @@ namespace Others.Managers
     /// <returns></returns>
     public void AddGatherablePlace(string placeName, int amount = 1)
     {
-      var emptyPoints = _state.Map.GetEmptyPoints().ToList();
+      var emptyPoints = State.Map.GetEmptyPoints().ToList();
 
       for (int i = 0; i < amount; i++)
       {
@@ -193,12 +193,14 @@ namespace Others.Managers
 
           if (building.Doors.ContainsKey(point))
           {
-            type = "woodenDoor";
+            var door = building.Doors[point];
+            type = door.Name;
           }
           else if (building.Walls.ContainsKey(point))
           {
-            type = "woodenWall";
-            additionalProperties.Add("wallType", Path.GetFileName(building.Walls[point].AdditionalProperties["wallType"].Value));
+            var wall = building.Walls[point];
+            type = wall.Name;
+            additionalProperties.Add("wallType", Path.GetFileName(wall.AdditionalProperties["wallType"].Value));
           }
 
           household.AddPlace(type, x, y, additionalProperties);
@@ -216,7 +218,7 @@ namespace Others.Managers
         if (place.Data.PlaceType.IsConstructable)
           place.AdditionalProperties["construction%"].Value = "100";
 
-        _state.EditPlaceEntity(place);
+        State.EditPlaceEntity(place);
         RemoveTask("construct", place.Id);
       }
     }
@@ -395,7 +397,7 @@ namespace Others.Managers
       };
 
       GameWorld.Villagers.Add(villager);
-      _state.AddVillagerEntity(villager);
+      State.AddVillagerEntity(villager);
 
       return villager;
     }
@@ -407,6 +409,11 @@ namespace Others.Managers
       UpdateVillager();
 
       UpdatePlaces();
+
+      foreach(var household in GameWorld.Households)
+      {
+        household.Update(gameTime);
+      }
 
       _grm.Update(gameTime);
     }
@@ -421,7 +428,7 @@ namespace Others.Managers
         }
         else
         {
-          _state.EditPlaceEntity(GameWorld.Places[i]);
+          State.EditPlaceEntity(GameWorld.Places[i]);
         }
       }
     }
@@ -545,7 +552,7 @@ namespace Others.Managers
         foreach (var villager in GameWorld.Villagers)
         {
           villager.Load(GameWorld);
-          _state.AddVillagerEntity(villager);
+          State.AddVillagerEntity(villager);
         }
 
         foreach (var household in GameWorld.Households)
@@ -560,7 +567,7 @@ namespace Others.Managers
           {
             place.Household = GameWorld.Households.FirstOrDefault(c => c.Id == place.HouseholdId);
           }
-          _state.AddPlaceEntity(place);
+          State.AddPlaceEntity(place);
         }
       }
       else

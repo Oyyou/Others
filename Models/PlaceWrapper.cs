@@ -58,5 +58,10 @@ namespace Others.Models
     {
       Data = place;
     }
+
+    public override string ToString()
+    {
+      return Name;
+    }
   }
 }

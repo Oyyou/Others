@@ -329,25 +329,27 @@ namespace Others.States
     {
       entity.LoadContent();
 
-      Func<bool> canAdd = null;
-
-      if (entity.AdditionalProperties.ContainsKey("construction%"))
-      {
-        if (entity.AdditionalProperties["construction%"] != "100")
-        {
-          canAdd = () =>
-          {
-            if (entity.AdditionalProperties["construction%"] == "100")
-              return true;
-
-            return false;
-          };
-        }
-      }
-
       var mappedComponent = entity.GetComponent<MappedComponent>();
       if (mappedComponent != null)
+      {
+        Func<bool> canAdd = null;
+
+        if (entity.AdditionalProperties.ContainsKey("construction%"))
+        {
+          if (entity.AdditionalProperties["construction%"] != "100")
+          {
+            canAdd = () =>
+            {
+              if (entity.AdditionalProperties["construction%"] == "100")
+                return true;
+
+              return false;
+            };
+          }
+        }
+
         Map.Add(mappedComponent, canAdd);
+      }
 
       _entities.Add(entity);
     }

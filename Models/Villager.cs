@@ -342,7 +342,10 @@ namespace Others.Models
 
       if (Path.Count == 0)
       {
-        Path = gwm.Pathfinder.GetPathNextTo(MapPoint, place.Point);
+        // Currently, we only allow to go to the corner of a place that we're constructing
+        var isPlaceConstructable = place.Data.PlaceType.IsConstructable && place.AdditionalProperties["construction%"].Value != "100";
+
+        Path = gwm.Pathfinder.GetPathNextTo(MapPoint, place.Point, isPlaceConstructable);
       }
 
       // Notice how this isn't and else if (that was intentional)

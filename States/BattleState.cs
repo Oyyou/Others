@@ -68,7 +68,15 @@ namespace Others.States
     //public GUI.Panel Panel;
     //public GUI.CraftingDetails.Panel CraftingPanel;
 
+    /// <summary>
+    /// These controls aren't affected by the camera
+    /// </summary>
     private List<Control> _controls;
+
+    /// <summary>
+    /// These controls are affected by the camera
+    /// </summary>
+    private List<Control> _gameControls; 
 
     private List<Control> _buildingControls;
     #endregion
@@ -113,8 +121,12 @@ namespace Others.States
       _controls = new List<Control>()
       {
         GetControlsPanel(),
-        InfoButton,
         //GetBuildingItemsPanel(),
+      };
+
+      _gameControls = new List<Control>()
+      {
+        InfoButton
       };
 
       _buildingControls = new List<Control>()
@@ -472,6 +484,14 @@ namespace Others.States
         control.Update(gameTime);
       }
 
+      foreach (var control in _gameControls)
+      {
+        if (!control.HasTag(State.ToString()))
+          continue;
+
+        control.Update(gameTime);
+      }
+
       _gwm.Update(gameTime);
       _hbm.Update(gameTime);
 
@@ -548,6 +568,8 @@ namespace Others.States
       _hbm.Draw(gameTime, _spriteBatch, _camera);
 
       DrawGUI(gameTime);
+
+      DrawGameGUI(gameTime);
     }
 
     private void DrawGUI(GameTime gameTime)
@@ -576,6 +598,22 @@ namespace Others.States
       }
 
       _spriteBatch.End();
+    }
+
+    private void DrawGameGUI(GameTime gameTime)
+    {
+      foreach (var control in _gameControls)
+      {
+        if (!control.HasTag(State.ToString()))
+          continue;
+
+        _spriteBatch.Begin(SpriteSortMode.FrontToBack, transformMatrix: _camera);
+
+        GameModel.GraphicsDevice.Viewport = new Viewport(control.Viewport);
+        control.Draw(gameTime, _spriteBatch);
+        _spriteBatch.End();
+      }
+
     }
   }
 }

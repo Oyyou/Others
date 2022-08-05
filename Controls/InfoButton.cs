@@ -18,6 +18,8 @@ namespace Others.Controls
 
     private float opacity = 0f;
 
+    private Color _colour = Color.White;
+
     public override Rectangle ClickRectangle => _position.ToRectangle(_texture.Width, _texture.Height);
 
     public InfoButton(Texture2D texture)
@@ -25,6 +27,15 @@ namespace Others.Controls
       _texture = texture;
       IsVisible = false;
       opacity = 0f;
+
+      Layer = 1f;
+
+      OnHover = () =>
+      {
+        IsVisible = true;
+        _timer = 0f;
+        _colour = Color.Gray;
+      };
     }
 
     public void Set(Rectangle rectangle)
@@ -47,8 +58,6 @@ namespace Others.Controls
         return;
       }
 
-      base.Update(gameTime);
-
       opacity += 0.1f;
       opacity = MathHelper.Clamp(opacity, 0f, 1f);
 
@@ -59,11 +68,8 @@ namespace Others.Controls
         IsVisible = false;
       }
 
-      if (GameMouse.Intersects(ClickRectangle))
-      {
-        IsVisible = true;
-        _timer = 0f;
-      }
+      _colour = Color.White;
+      base.Update(gameTime); // Hover stuff happens in here 
     }
 
     public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -71,7 +77,7 @@ namespace Others.Controls
       if (!IsVisible && opacity <= 0)
         return;
 
-      spriteBatch.Draw(_texture, _position, Color.White * opacity);
+      spriteBatch.Draw(_texture, _position, null, _colour * opacity, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, DrawLayer);
 
       DrawChildren(gameTime, spriteBatch);
     }

@@ -49,6 +49,8 @@ namespace Others.Controls
 
     public abstract Rectangle ClickRectangle { get; }// => new Rectangle((int)DrawPosition.X, (int)DrawPosition.Y, 10, 10);// _texture.Width, _texture.Height); // TODO: Fix
 
+    public virtual bool ClickIsVisible => Parent != null ? Parent.IsVisible && IsVisible : IsVisible;
+
     public Vector2 ChildrenOffset = Vector2.Zero;
 
     public Rectangle Viewport = new Rectangle(0, 0, ZonerGame.ScreenWidth, ZonerGame.ScreenHeight);
@@ -171,7 +173,6 @@ namespace Others.Controls
 
           if (GameMouse.IsLeftClicked)
           {
-            GameMouse.ClickableObjects.Remove(this);
             IsMouseClicked = true;
             OnClicked?.Invoke(this);
           }
@@ -179,7 +180,6 @@ namespace Others.Controls
       }
       else
       {
-        GameMouse.ClickableObjects.Remove(this);
         if (!GameMouse.IsLeftPressed)
         {
           IsHeld = false;

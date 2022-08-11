@@ -20,6 +20,8 @@ namespace Others.Controls
 
     private Color _colour = Color.White;
 
+    private const float LIFE_SPAN = 0.3f;
+
     public override Rectangle ClickRectangle => _position.ToRectangle(_texture.Width, _texture.Height);
 
     public InfoButton(Texture2D texture)
@@ -63,7 +65,7 @@ namespace Others.Controls
 
       _timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-      if (_timer > 3f)
+      if (_timer > LIFE_SPAN)
       {
         IsVisible = false;
       }

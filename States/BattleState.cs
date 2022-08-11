@@ -519,8 +519,8 @@ namespace Others.States
           i--;
         }
       }
-
-
+      // TODO: We need to handle the click _after_ everything has updated
+      GameMouse.HandleClick?.Invoke();
 
       if (GameMouse.IsLeftClicked)
       {
